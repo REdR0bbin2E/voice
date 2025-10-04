@@ -1,9 +1,39 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import auth0 from '../../auth0';
 
 const { width, height } = Dimensions.get('window');
 
 const LoginScreen: React.FC = () => {
+    const [user, setUser] = useState<any>(null);
+
+    const loginWithAuth0 = async () => {
+        try {
+            const credentials = await auth0.webAuth.authorize({
+                scope: 'openid profile email',
+                audience: `https://${'YOUR_AUTH0_DOMAIN'}/userinfo`,
+            });
+
+            const userInfo = await auth0.auth.userInfo({ token: credentials.accessToken });
+            setUser(userInfo);
+            Alert.alert('Welcome', `Hello, ${userInfo.name || 'User'}!`);
+        } catch (error) {
+            console.log('Auth0 login error', error);
+            Alert.alert('Login failed', 'Unable to log in. Please try again.');
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await auth0.webAuth.clearSession({});
+            setUser(null);
+            Alert.alert('Logged out', 'You have been logged out.');
+        } catch (error) {
+            console.log('Auth0 logout error', error);
+            Alert.alert('Logout failed', 'Unable to log out.');
+        }
+    };
+
     return (
         <View style={styles.container}>
             {/* Background circles */}
@@ -15,19 +45,31 @@ const LoginScreen: React.FC = () => {
                 <Text style={styles.title}>Welcome Back</Text>
                 <Text style={styles.subtitle}>Your space for reflection and calm</Text>
 
-                <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#AFAFAF" />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="#AFAFAF"
-                    secureTextEntry
-                />
+                {!user && (
+                    <>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Username"
+                            placeholderTextColor="#AFAFAF"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Password"
+                            placeholderTextColor="#AFAFAF"
+                            secureTextEntry
+                        />
+                    </>
+                )}
 
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Log In</Text>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={user ? logout : loginWithAuth0}
+                >
+                    <Text style={styles.buttonText}>{user ? 'Log Out' : 'Log In'}</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.footer}>Need help? Contact support</Text>
+                {user && <Text style={styles.footer}>Logged in as {user.name || user.email}</Text>}
+                {!user && <Text style={styles.footer}>Need help? Contact support</Text>}
             </View>
         </View>
     );
@@ -68,7 +110,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },
-        elevation: 6, // for Android shadow
+        elevation: 6, // Android shadow
     },
     title: {
         fontSize: 24,
