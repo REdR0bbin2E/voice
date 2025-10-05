@@ -1,98 +1,333 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Image } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const { width, height } = Dimensions.get('window');
 
-export default function HomeScreen() {
+const SignupScreen: React.FC = () => {
+  const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const isValid = useMemo(() => {
+    if (!username.trim() || !email.trim() || !password || !confirmPassword) return false;
+    // simple email check
+    const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+    const passwordsMatch = password === confirmPassword && password.length >= 8;
+    return emailOk && passwordsMatch;
+  }, [username, email, password, confirmPassword]);
+
+  function onSubmit() {
+    if (!isValid) return;
+    // TODO: call real signup API here
+    router.replace('/(tabs)/HomePage');
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.container}>
+      {/* Background circles */}
+      <View style={[styles.circle, styles.circleOne]} />
+      <View style={[styles.circle, styles.circleTwo]} />
+      <View style={[styles.circle, styles.circleThree]} />
+      <View style={[styles.circle, styles.circleFour]} />
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
+
+
+
+        {/* Logo/Brand Section */}
+        <View style={styles.brandContainer}>
+          <Image source={require('../../assets/images/echoTempLogo.png')} resizeMode='contain' style={{ width: 175, height: 175 }} />
+          <Text style={styles.brandTagline}>Reflect • Connect • Grow</Text>
+        </View>
+
+        {/* Signup card */}
+        <View style={styles.card}>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Start your journey of reflection</Text>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Username</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Choose a unique username"
+              placeholderTextColor="#B8B8B8"
+              autoCapitalize="none"
+              value={username}
+              onChangeText={setUsername}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="your.email@example.com"
+              placeholderTextColor="#B8B8B8"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Minimum 8 characters"
+              placeholderTextColor="#B8B8B8"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Confirm Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Re-enter your password"
+              placeholderTextColor="#B8B8B8"
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, !isValid && { opacity: 0.6 }]}
+            activeOpacity={0.8}
+            onPress={onSubmit}
+            disabled={!isValid}
+          >
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity style={styles.loginLink} onPress={() => router.push('./(tabs)/explore')}>
+            <Text style={styles.loginLinkText}>
+              Already have an account? <Text style={styles.loginLinkBold}>Log in</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Extra padding at bottom */}
+        <View style={styles.bottomPadding} />
+      </ScrollView>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: '#F6F1E9',
   },
-  stepContainer: {
-    gap: 8,
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    minHeight: height,
+  },
+
+  // Background circles
+  circle: {
+    position: 'absolute',
+    borderRadius: 9999,
+    opacity: 0.15,
+  },
+  circleOne: {
+    width: 280,
+    height: 280,
+    top: -100,
+    left: -80,
+    backgroundColor: '#E8C07D',
+  },
+  circleTwo: {
+    width: 350,
+    height: 350,
+    bottom: -140,
+    right: -120,
+    backgroundColor: '#B7A9C9',
+  },
+  circleThree: {
+    width: 200,
+    height: 200,
+    top: height * 0.3,
+    right: -70,
+    backgroundColor: '#E6AFA4',
+    opacity: 0.1,
+  },
+  circleFour: {
+    width: 160,
+    height: 160,
+    bottom: height * 0.25,
+    left: -50,
+    backgroundColor: '#F2C6C2',
+    opacity: 0.12,
+  },
+
+  // Brand section
+  brandContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  logoCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#E6AFA4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    shadowColor: '#E6AFA4',
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  logoText: {
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  brandName: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#B7A9C9',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  brandTagline: {
+    fontSize: 13,
+    color: '#B7A9C9',
+    opacity: 0.6,
+    letterSpacing: 0.5,
+  },
+
+  // Card
+  card: {
+    width: width - 40,
+    maxWidth: 400,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 28,
+    alignItems: 'center',
+    shadowColor: '#B7A9C9',
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(183, 169, 201, 0.1)',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#F2C6C2',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  subtitle: {
+    fontSize: 15,
+    color: '#B7A9C9',
+    marginBottom: 28,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+
+  // Input fields
+  inputContainer: {
+    width: '100%',
+    marginBottom: 18,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#6B6B6B',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  input: {
+    width: '100%',
+    padding: 14,
+    borderWidth: 1.5,
+    borderColor: '#E5E5E5',
+    borderRadius: 12,
+    fontSize: 15,
+    backgroundColor: '#FAFAFA',
+    color: '#2C2C2E',
+  },
+
+  // Button
+  button: {
+    width: '100%',
+    padding: 16,
+    backgroundColor: '#E6AFA4',
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+    shadowColor: '#E6AFA4',
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+
+  // Divider
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E5E5',
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    fontSize: 13,
+    color: '#B8B8B8',
+    fontWeight: '500',
+  },
+
+  // Login link
+  loginLink: {
+    paddingVertical: 8,
+  },
+  loginLinkText: {
+    fontSize: 14,
+    color: '#8E8E93',
+  },
+  loginLinkBold: {
+    fontWeight: '600',
+    color: '#E6AFA4',
+  },
+
+  // Bottom padding
+  bottomPadding: {
+    height: 40,
   },
 });
+
+export default SignupScreen;
