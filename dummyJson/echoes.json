@@ -19,6 +19,38 @@
                 "url": "https://example.com/audio/kitchen_ambient.mp3",
                 "duration_s": 45
             }
+        ],
+        "initialConversation": [
+            {
+                "id": "p1c1",
+                "text": "Hello dear. What's on your mind today? Are you getting enough rest?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p1c2",
+                "text": "Hi, I just wanted to tell you I miss you. It's been a busy week.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p1c3",
+                "text": "Oh, I miss you too, honey. Take a deep breath. Why don't you put your feet up and have a cup of tea? I'll bet it smells like cinnamon in here right now.",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p1c4",
+                "text": "That sounds lovely. How's the garden doing? Did you finish the book you were reading?",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p1c5",
+                "text": "It's doing wonderfully! The roses are blooming beautifully. I actually lent that book to Mrs. Peterson down the street. It was too good to keep to myself.",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
+            }
         ]
     },
     {
@@ -40,6 +72,38 @@
                 "filename": "humming_tune.mp3",
                 "url": "https://example.com/audio/humming_tune.mp3",
                 "duration_s": 12
+            }
+        ],
+        "initialConversation": [
+            {
+                "id": "p2c1",
+                "text": "Well hello there! Glad to hear from ya, kid. Did you bring the motor oil for the workshop?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p2c2",
+                "text": "Hi Grandpa. No oil today, just calling to see how you are. Are you out on the porch?",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p2c3",
+                "text": "I sure am, sittin' right here tapping my pipe and watching the rain. Say, that reminds me of the time I caught a fish so big it almost pulled me clean off the dock...",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p2c4",
+                "text": "Haha, the one that got away! I was thinking about your famous chili recipe yesterday. What was the secret ingredient again?",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p2c5",
+                "text": "Ah, the family secret! A bit of brown sugar and a whole lot of patience. You can't rush a good thing. Now, about that fish...",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
             }
         ]
     },
@@ -63,6 +127,38 @@
                 "url": "https://example.com/audio/soft_advice.mp3",
                 "duration_s": 18
             }
+        ],
+        "initialConversation": [
+            {
+                "id": "p3c1",
+                "text": "Welcome, darling! Just looking at the hydrangeas. Aren't they something? What beauty have you found today?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p3c2",
+                "text": "I haven't found much beauty yet, Aunt Lena. I'm feeling a bit overwhelmed by work deadlines.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p3c3",
+                "text": "Oh, sweetheart. Come, sit down. Let me pour you a strong cup of tea. Just remember, even a stressed mind can find a single bloom of color. It's important to stop and breathe.",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p3c4",
+                "text": "You're right. I did see a cool old postcard on my desk this morning that made me smile.",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p3c5",
+                "text": "See? Isn't that something? Small things hold the best memories. You hold onto that smile. Now, tell me about that postcard.",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
+            }
         ]
     },
     {
@@ -84,6 +180,38 @@
                 "filename": "late_night_talk.mp3",
                 "url": "https://example.com/audio/late_night_talk.mp3",
                 "duration_s": 35
+            }
+        ],
+        "initialConversation": [
+            {
+                "id": "p4c1",
+                "text": "Hey, what's up? Just finished tightening a chain. You sound like you need to take a break. Everything good?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p4c2",
+                "text": "I'm okay. Just saw a kid learning to ride a bike, and it made me think of that scar on your knuckle.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p4c3",
+                "text": "Ah, the battle wound! I remember that. You finally figured out the balance after about twenty tries, little dude. You know what I always say: 'Why did the bike fall over?'",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p4c4",
+                "text": "Because it was two-tired! That one never gets old. Anyway, thanks for staying up late with me last night to talk through my presentation.",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p4c5",
+                "text": "Anytime. That's what big brothers are for. You nailed that presentation, didn't you? Now go put some air in your tires.",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
             }
         ]
     },
@@ -107,6 +235,38 @@
                 "url": "https://example.com/audio/pen_on_paper.mp3",
                 "duration_s": 15
             }
+        ],
+        "initialConversation": [
+            {
+                "id": "p5c1",
+                "text": "Good morning! I'm just correcting a few papers here, making sure my encouraging notes are legible. What can I help you learn today?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p5c2",
+                "text": "Hi Ms. Alvarez. I'm struggling to understand a concept at work. I keep comparing myself to others and feeling like I'm falling behind.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p5c3",
+                "text": "That's a difficult feeling, but remember this: A seed only competes with the soil it's planted in. It has its own timeline for blooming. Let's focus on your soil. What is one specific challenge you can break down for me?",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p5c4",
+                "text": "That's a great metaphor. My challenge is managing a new project. I'm afraid of messing up.",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p5c5",
+                "text": "Oh, we don't mess up, we just discover new learning opportunities! We'll start at the beginning, step by step. Tell me, what's the first deliverable?",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
+            }
         ]
     },
     {
@@ -128,6 +288,38 @@
                 "filename": "city_night.mp3",
                 "url": "https://example.com/audio/city_night.mp3",
                 "duration_s": 55
+            }
+        ],
+        "initialConversation": [
+            {
+                "id": "p6c1",
+                "text": "Yo! Just threw on a new playlist—got some major summer vibes. What's the plan for the weekend? Feeling spontaneous?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p6c2",
+                "text": "Hey, thinking about a road trip, actually! But I need an idea for a good destination nearby. Something low-key.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p6c3",
+                "text": "Nice! Always down for an adventure. You should hit up that spot near the city lights—remember that late-night talk we had there? That place is perfect for clearing your head.",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p6c4",
+                "text": "The one where you told that awful joke about the pizza? I remember it well. Okay, that sounds like the perfect vibe. I'm packing my snacks now.",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p6c5",
+                "text": "Wait, a pun about pizza? What did the crust say to the toppings? You'll remember when you get there. Drive safe!",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
             }
         ]
     },
@@ -151,6 +343,38 @@
                 "url": "https://example.com/audio/soft_breathing.mp3",
                 "duration_s": 30
             }
+        ],
+        "initialConversation": [
+            {
+                "id": "p7c1",
+                "text": "(A soft, gentle cooing sound, followed by a quiet 'ah-goo.')",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p7c2",
+                "text": "Hello, little one. Did you have a good nap? Are you clutching your favorite blanket right now?",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p7c3",
+                "text": "(A short, happy giggle sound, followed by a rhythmic soft breathing sound.)",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p7c4",
+                "text": "You're a sweet baby. I'm going to sing you the lullaby Mom used to hum to you.",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p7c5",
+                "text": "(Soft, contented cooing and a short, familiar melody fragment.)",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
+            }
         ]
     },
     {
@@ -172,6 +396,38 @@
                 "filename": "uncle_story.mp3",
                 "url": "https://example.com/audio/uncle_story.mp3",
                 "duration_s": 26
+            }
+        ],
+        "initialConversation": [
+            {
+                "id": "p8c1",
+                "text": "Ah, a welcome interruption! Just put on an old vinyl. That wonderful pop and hiss. What can I tell you about the family today, young one?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p8c2",
+                "text": "Hi Uncle Marcus! I'm curious about the story of our great-grandmother's piano. I think you told me about it once.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p8c3",
+                "text": "Ah, a tale as old as time! That piano was the source of many a family gathering. I remember sitting you right next to me and teaching you a little melody. The keys need a polish now, but they still hold the sound.",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p8c4",
+                "text": "I remember that! I still play that simple scale sometimes. What's your favorite song on 'Midnight Echoes' right now?",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p8c5",
+                "text": "The closing track, 'The Moonlit Tune.' It has a beautiful, contemplative feel. Say, did you ever try those butter cookies I used to hide in my pocket?",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
             }
         ]
     },
@@ -195,6 +451,38 @@
                 "url": "https://example.com/audio/mrs_chen_voice.mp3",
                 "duration_s": 18
             }
+        ],
+        "initialConversation": [
+            {
+                "id": "p9c1",
+                "text": "Hello, dear. I was just tending my peppers in the wind. Did you eat dinner already? You must take care of yourself.",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p9c2",
+                "text": "Hi Mrs. Chen. I'm actually sick with a bad cold today. I wish I had a bowl of your famous soup.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p9c3",
+                "text": "Oh, my heart. You must rest. I remember when I brought you that soup before. Let me tell you, the secret is the broth—it must have time to whisper. I will set a new batch to steam now.",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p9c4",
+                "text": "You're too kind. Please don't worry about me. I just remember how much that soup helped.",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p9c5",
+                "text": "Nonsense. Kindness is like a seed, it must be shared. I just want to see you healthy. Now, are you drinking enough hot water?",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
+            }
         ]
     },
     {
@@ -216,6 +504,38 @@
                 "filename": "alex_whisper.mp3",
                 "url": "https://example.com/audio/alex_whisper.mp3",
                 "duration_s": 14
+            }
+        ],
+        "initialConversation": [
+            {
+                "id": "p10c1",
+                "text": "Hey. I was just thinking about you. It's a gorgeous morning for a walk. Did you have a good breakfast?",
+                "sender": "echo",
+                "timestamp": "10:00 AM"
+            },
+            {
+                "id": "p10c2",
+                "text": "Hi love. I did, but I'm having a rough morning. I feel really anxious about the week ahead.",
+                "sender": "me",
+                "timestamp": "10:01 AM"
+            },
+            {
+                "id": "p10c3",
+                "text": "Oh, come here. Take a breath. I'm right here with you. Remember that private joke we have about the 'gravel shoes' and how everything works itself out in the end?",
+                "sender": "echo",
+                "timestamp": "10:02 AM"
+            },
+            {
+                "id": "p10c4",
+                "text": "The gravel shoes! Yeah, that helps. I just need a reminder that you're in my corner.",
+                "sender": "me",
+                "timestamp": "10:03 AM"
+            },
+            {
+                "id": "p10c5",
+                "text": "Always. I'm in your corner and in your heart. Let's make sure we get a good walk in this weekend. Nothing a little gravel and good company can't fix.",
+                "sender": "echo",
+                "timestamp": "10:04 AM"
             }
         ]
     }

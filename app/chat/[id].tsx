@@ -3,161 +3,297 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Dimensions, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons'; // Assuming you have expo vector icons installed
+import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+// 💡 ASSUMPTION: You have created a file at this path with the JSON content you provided.
+// Load dummy JSON. Use require to avoid TS JSON module issues and ensure correct relative path.
+const DUMMY_PERSONAS: any = require('../../dummyJson/echoes.json'); // Updated path for typical Expo project structure
 
-// --- DUMMY CHAT MESSAGE STRUCTURE ---
+const { width, height } = Dimensions.get('window');
+
+// --- Types ---
 type ChatMessage = {
     id: string;
     text: string;
     sender: 'me' | 'echo';
     timestamp: string;
-    audioUrl?: string; // Future: URL for the generated voice response
+    audioUrl?: string;
 };
 
-const INITIAL_MESSAGES: ChatMessage[] = [
-    { id: '1', text: "Hello dear. What's on your mind today?", sender: 'echo', timestamp: '10:00 AM' },
-    { id: '2', text: "Hi, I just wanted to tell you I miss you.", sender: 'me', timestamp: '10:01 AM' },
-];
-// ------------------------------------
-
+// --- Component ---
 const ChatScreen: React.FC = () => {
     const params = useLocalSearchParams();
     const navigation = useNavigation();
 
-    // Retrieve the necessary parameters, including the full persona prompt
-    const { id: echoId, name, descriptionPrompt } = params;
+    // Safely extract and ensure 'id' is a string
+    const echoId = Array.isArray(params.id) ? params.id[0] : params.id;
 
-    const [messages, setMessages] = useState(INITIAL_MESSAGES.slice().reverse());
-    const [inputText, setInputText] = useState('');
-    const [isSending, setIsSending] = useState(false); // To disable input while waiting for response
+    // 1. Find the specific persona data
+    const persona = DUMMY_PERSONAS.find((p: any) => p.id === echoId);
 
-    // Set the header title dynamically
-    useLayoutEffect(() => {
-        if (name) {
-            navigation.setOptions({
-                title: name as string,
-                headerTitleStyle: { fontWeight: '600' }
-            });
-        }
-    }, [name, navigation]);
-
-    // Simulation of the Gemini/Backend API call
-    const simulateEchoResponse = async (userMessage: string) => {
-        // --- THIS IS THE CRITICAL LOGIC FOR YOUR PROJECT ---
-        // 1. Send the `descriptionPrompt` + `conversation history` + `userMessage` 
-        //    to Elizabeth's FastAPI endpoint.
-
-        console.log("--- Sending to Backend ---");
-        console.log("Echo ID:", echoId);
-        console.log("Persona Prompt (Gemini Context):", descriptionPrompt);
-        console.log("User Message:", userMessage);
-
-        // Simulating the delay for Gemini processing and fish-speech TTS
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        const echoReply: ChatMessage = {
-            id: Date.now().toString() + '_echo',
-            // Placeholder: This is the text that should come back from Gemini
-            text: `(AI Response for ${name}): That reminds me of a story I once told you...`,
-            sender: 'echo',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            audioUrl: 'https://example.com/audio/response_from_backend.mp3' // Future: Audio URL from fish-speech
-        };
-
-        // Add the Echo's response
-        setMessages(prev => [echoReply, ...prev]);
+    if (!persona) {
+        return (
+            <View style={[styles.container, styles.centerContent]}>
+                <Text style={styles.errorText}>Loading or Echo not found...</Text>
+                <ActivityIndicator size="large" color="#556ee6" />
+            </View>
+        );
     }
 
-    const handleSend = async () => {
-        const textToSend = inputText.trim();
-        if (!textToSend) return;
+    const { name } = persona;
 
+    // The initial messages are loaded from the persona's conversation, reversed for FlatList
+    const initialMessages: ChatMessage[] = (persona.initialConversation || []).slice().reverse();
+
+    // State
+    const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+    const [inputText, setInputText] = useState('');
+    const [isSending, setIsSending] = useState(false);
+
+    // Get the height of the safe area/header bar dynamically for better offset calculation
+    // This value is often around 90-100 for default Expo headers on iOS devices
+    const headerHeight = 90;
+
+    // Set header title
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: name,
+            headerTintColor: '#333',
+            headerStyle: {
+                backgroundColor: '#FFF',
+            },
+            headerRight: () => (
+                <TouchableOpacity onPress={() => console.log('Settings Pressed')} style={{ paddingHorizontal: 5 }}>
+                    <Ionicons name="ellipsis-vertical" size={24} color="#556ee6" />
+                </TouchableOpacity>
+            ),
+        });
+    }, [navigation, name]);
+
+    // Dummy response simulation
+    const simulateEchoResponse = (userMessage: string) => {
         setIsSending(true);
-        setInputText(''); // Clear input immediately
+        setTimeout(() => {
+            const newEchoMessage: ChatMessage = {
+                id: `c${Date.now() + 1}`,
+                text: `(Echoing ${name}'s style): I hear that, and I understand. That reminds me of a little something from the past...`,
+                sender: 'echo',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            };
+            setMessages(prevMessages => [newEchoMessage, ...prevMessages]);
+            setIsSending(false);
+        }, 1500); // Simulate network delay
+    };
 
-        const userMessage: ChatMessage = {
-            id: Date.now().toString() + '_me',
-            text: textToSend,
+    // Handler for sending a message
+    const handleSend = () => {
+        if (inputText.trim() === '' || isSending) return;
+
+        const newUserMessage: ChatMessage = {
+            id: `c${Date.now()}`,
+            text: inputText.trim(),
             sender: 'me',
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
 
-        // Add user message to the UI
-        setMessages(prev => [userMessage, ...prev]);
-
-        // Get Echo's response
-        await simulateEchoResponse(textToSend);
-
-        setIsSending(false);
+        setMessages(prevMessages => [newUserMessage, ...prevMessages]);
+        setInputText('');
+        simulateEchoResponse(newUserMessage.text);
     };
 
-    const renderMessage = ({ item }: { item: ChatMessage }) => (
-        <View style={[
-            styles.messageBubble,
-            item.sender === 'me' ? styles.myMessage : styles.otherMessage
-        ]}>
-            <Text style={[styles.messageText, item.sender === 'me' ? { color: '#FFFFFF' } : { color: '#2C2C2E' }]}>{item.text}</Text>
-            <Text style={[styles.timestamp, item.sender === 'me' ? { color: 'rgba(255,255,255,0.7)' } : { color: '#8E8E93' }]}>{item.timestamp}</Text>
-        </View>
-    );
+    // Render function for each message in the list
+    const renderMessage = ({ item }: { item: ChatMessage }) => {
+        const isMyMessage = item.sender === 'me';
+        return (
+            <View style={[
+                styles.messageContainer,
+                isMyMessage ? styles.myMessageContainer : styles.echoMessageContainer
+            ]}>
+                <Text style={isMyMessage ? styles.myMessageText : styles.echoMessageText}>
+                    {item.text}
+                </Text>
+                <Text style={[styles.timestamp, isMyMessage ? styles.myTimestamp : styles.echoTimestamp]}>
+                    {item.timestamp}
+                </Text>
+            </View>
+        );
+    };
 
     return (
         <KeyboardAvoidingView
             style={styles.container}
+            // ⭐️ FIX: Use a more accurate offset (headerHeight) to lift the input area 
+            // and adjust behavior for Android to use 'height' instead of 'padding' which is often better.
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
         >
             <FlatList
                 data={messages}
                 renderItem={renderMessage}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.listContent}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.messageList}
                 inverted
+                // Adding a little padding to the bottom of the inverted list
+                ListFooterComponent={<View style={{ height: 10 }} />}
             />
 
-            {/* Input area */}
+            {isSending && (
+                <View style={styles.typingIndicator}>
+                    <ActivityIndicator size="small" color="#556ee6" />
+                    <Text style={styles.typingText}>{name} is responding...</Text>
+                </View>
+            )}
+
             <View style={styles.inputContainer}>
+                {/* Add a button for audio input, which is key to an 'Echo' app */}
+                <TouchableOpacity style={styles.micButton} onPress={() => console.log('Audio Record Pressed')}>
+                    <Ionicons name="mic-outline" size={24} color="#556ee6" />
+                </TouchableOpacity>
+
                 <TextInput
-                    style={styles.input}
-                    placeholder={`Write to ${name}...`}
-                    placeholderTextColor="#999"
+                    style={styles.textInput}
                     value={inputText}
                     onChangeText={setInputText}
+                    placeholder={`Type a message to ${name}...`}
+                    placeholderTextColor="#999"
                     multiline
-                    editable={!isSending}
                 />
                 <TouchableOpacity
-                    style={[styles.sendButton, { opacity: inputText.trim() && !isSending ? 1 : 0.4 }]}
-                    activeOpacity={0.8}
+                    style={[styles.sendButton, inputText.trim() === '' && styles.sendButtonDisabled]}
                     onPress={handleSend}
-                    disabled={!inputText.trim() || isSending}
+                    disabled={inputText.trim() === '' || isSending}
                 >
-                    {isSending ? (
-                        <ActivityIndicator color="#FFFFFF" size="small" />
-                    ) : (
-                        <Ionicons name="send" size={20} color="#FFFFFF" />
-                    )}
+                    <Ionicons name="send" size={22} color="#FFF" />
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
     );
 };
 
-// ... (Styles remain the same)
+// --- Styles ---
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F6F1E9', },
-    listContent: { paddingHorizontal: 10, paddingTop: 10, paddingBottom: 5, },
-    messageBubble: { maxWidth: width * 0.75, padding: 12, borderRadius: 20, marginBottom: 8, },
-    myMessage: { alignSelf: 'flex-end', backgroundColor: '#E6AFA4', borderTopRightRadius: 5, },
-    otherMessage: { alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderTopLeftRadius: 5, },
-    messageText: { fontSize: 16, lineHeight: 22, },
-    timestamp: { fontSize: 10, alignSelf: 'flex-end', marginTop: 5, },
-    inputContainer: { flexDirection: 'row', alignItems: 'flex-end', padding: 8, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E5E5E5', },
-    input: { flex: 1, maxHeight: 120, minHeight: 40, backgroundColor: '#F0F0F0', borderRadius: 20, paddingHorizontal: 15, paddingTop: 10, paddingBottom: 10, marginRight: 8, fontSize: 16, },
-    sendButton: { justifyContent: 'center', alignItems: 'center', height: 40, width: 40, borderRadius: 20, backgroundColor: '#B7A9C9', marginBottom: Platform.OS === 'ios' ? 0 : 4, },
-    sendButtonText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14, },
+    container: {
+        flex: 1,
+        backgroundColor: '#f9f9f9', // Lighter, modern chat background
+    },
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        textAlign: 'center',
+        padding: 20,
+        fontSize: 16,
+        color: '#333',
+    },
+    messageList: {
+        paddingHorizontal: 10,
+        paddingTop: 10,
+    },
+    messageContainer: {
+        maxWidth: width * 0.8, // Slightly wider bubbles
+        marginVertical: 4,
+        padding: 12, // Increased padding
+        borderRadius: 20, // More rounded corners
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08, // Subtle shadow
+        shadowRadius: 2,
+        elevation: 1.5,
+    },
+    // My Messages (Right Side)
+    myMessageContainer: {
+        alignSelf: 'flex-end',
+        backgroundColor: '#556ee6', // Slightly darker, professional blue
+        borderTopRightRadius: 4, // Sharp edge on top-right (standard chat look)
+    },
+    myMessageText: {
+        color: '#FFF',
+        fontSize: 15,
+    },
+    myTimestamp: {
+        color: 'rgba(255, 255, 255, 0.7)',
+        textAlign: 'right',
+    },
+    // Echo Messages (Left Side)
+    echoMessageContainer: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#EAEAEA', // Light grey for incoming messages
+        borderTopLeftRadius: 4, // Sharp edge on top-left
+    },
+    echoMessageText: {
+        color: '#333',
+        fontSize: 15,
+    },
+    echoTimestamp: {
+        color: '#888',
+        textAlign: 'left',
+    },
+    timestamp: {
+        fontSize: 10,
+        marginTop: 5,
+        lineHeight: 12,
+    },
+    // Input Area
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        backgroundColor: '#FFF',
+        borderTopWidth: 1,
+        borderTopColor: '#EEE',
+    },
+    micButton: {
+        width: 44,
+        height: 44,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 22,
+        marginRight: 8,
+        // Optional: Add a subtle background color to the button itself
+        // backgroundColor: '#F0F3FF', 
+    },
+    textInput: {
+        flex: 1,
+        maxHeight: 100,
+        minHeight: 40,
+        paddingHorizontal: 15,
+        paddingTop: Platform.OS === 'ios' ? 10 : 8,
+        paddingBottom: Platform.OS === 'ios' ? 10 : 8,
+        backgroundColor: '#F0F0F0',
+        borderRadius: 22, // Match the button radius
+        fontSize: 16,
+        marginRight: 8,
+        // Align text better in multiline
+        textAlignVertical: 'center',
+    },
+    sendButton: {
+        backgroundColor: '#556ee6',
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    sendButtonDisabled: {
+        backgroundColor: '#C8D5E0',
+    },
+    typingIndicator: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        alignSelf: 'flex-start',
+        marginLeft: 10,
+        marginBottom: 5,
+    },
+    typingText: {
+        marginLeft: 8,
+        color: '#666',
+        fontSize: 13,
+        fontStyle: 'italic',
+    }
 });
 
 export default ChatScreen;
