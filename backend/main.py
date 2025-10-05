@@ -1,11 +1,15 @@
-from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
 from pydantic import BaseModel
 from typing import Optional, List
 import os
 from bson import ObjectId
 import google.generativeai as genai
 from database import DatabaseManager
+from voice_service import VoiceServiceWrapper
 
 # Initialize FastAPI app
 app = FastAPI(title="Echo API", version="1.0.0")
@@ -25,6 +29,12 @@ db_manager = DatabaseManager()
 # Configure Gemini AI
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+# Initialize templates
+templates = Jinja2Templates(directory="templates")
+
+# Initialize voice service
+voice_service = VoiceServiceWrapper()
+
 # Pydantic models for request/response
 class CreateEchoRequest(BaseModel):
     name: str
@@ -43,9 +53,14 @@ class EchoResponse(BaseModel):
     name: str
     created_at: str
 
-# Health check endpoint
-@app.get("/")
-async def root():
+# Serve HTML test page
+@app.get("/", response_class=HTMLResponse)
+async def serve_test_page(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+# Health check endpoint  
+@app.get("/api/health")
+async def health_check():
     return {"message": "Echo API is running"}
 
 # Create Echo endpoint
@@ -161,6 +176,44 @@ async def get_echo_info(auth0_id: str):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get echo info: {str(e)}")
+
+# Voice synthesis endpoint
+@app.post("/api/synthesize")
+async def synthesize_speech(
+    text: str = Form(...),
+    reference_id: Optional[str] = Form(None)
+):
+    try:
+        result = voice_service.synthesize(text, reference_id=reference_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Upload reference audio endpoint
+@app.post("/api/upload-reference")
+async def upload_reference(
+    audio: UploadFile = File(...),
+    name: Optional[str] = Form(None)
+):
+    try:
+        # Read audio file
+        audio_bytes = await audio.read()
+        
+        # Upload to Fish.Audio
+        result = voice_service.upload_reference_audio(audio_bytes, name or audio.filename)
+        
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Get available voices
+@app.get("/api/voices")
+async def get_voices():
+    try:
+        voices = voice_service.get_available_voices()
+        return {"voices": voices}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

@@ -31,7 +31,10 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
+backend/.env
+fish/.env
 
 # typescript
 *.tsbuildinfo
@@ -41,6 +44,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Fish Speech local model (using Fish.Audio API instead)
+fish/
 
 .env
 database.py

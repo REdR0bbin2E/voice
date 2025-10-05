@@ -5,7 +5,6 @@ import { Platform } from 'react-native'; // Import Platform for conditional styl
 // Assuming these imports are correctly aliased in your project
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol'; // Using IconSymbol for SF Symbols
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
@@ -113,7 +112,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={24} name="arrow.up" color={color} />,
         }}
       />
-
 
     </Tabs>
   );

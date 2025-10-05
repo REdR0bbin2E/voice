@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo Voice API - Test Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            color: #155724;
+        }
+        
+        .status-icon {
+            font-size: 1.5em;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .endpoint {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .endpoint-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .endpoint-desc {
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        .test-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            margin: 10px 10px 0 0;
+            transition: all 0.3s;
+        }
+        
+        .test-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .test-button:active {
+            transform: translateY(0);
+        }
+        
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        #uploadResult {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        .result-success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .result-error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+        
+        .input-group input[type="file"] {
+            border: 2px dashed #ddd;
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+        
+        .input-group input[type="file"]:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎙️ Echo Voice API</h1>
+            <p>Text-to-Speech powered by Fish.Audio</p>
+        </div>
+        
+        <div class="content">
+            <div class="status">
+                <span class="status-icon">✅</span>
+                <span>Server is running and healthy!</span>
+            </div>
+            
+            <div class="section">
+                <h2>🎙️ Voice Cloning Setup (Optional)</h2>
+                <p style="color: #666; margin-bottom: 15px;">Upload reference audio to create a custom voice model, or use a voice model ID from <a href="https://fish.audio/" target="_blank">Fish.Audio</a></p>
+                
+                <div class="input-group">
+                    <label for="audioFile">Upload Reference Audio (.wav, .mp3):</label>
+                    <input type="file" id="audioFile" accept="audio/*" />
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        ⚠️ <strong>IMPORTANT:</strong> Audio must be <strong>10-30 seconds long</strong> (Fish.Audio limit: under 270 seconds).
+                        <br>File should be under 1-2 MB for best results. Longer files will be rejected!
+                    </small>
+                </div>
+                
+                <button class="test-button" onclick="uploadAndSetVoice()">Upload & Create Voice Model</button>
+                
+                <div style="margin: 20px 0; padding: 15px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                    <strong>OR</strong> paste an existing voice model ID below (skip upload if you already have one)
+                </div>
+                
+                <div id="uploadResult"></div>
+            </div>
+            
+            <div class="section">
+                <h2>🎤 Generate Voice</h2>
+                
+                <div class="input-group">
+                    <label for="textInput">Text to synthesize:</label>
+                    <textarea id="textInput" placeholder="Enter text here...">Hello! This is a test of the Echo voice system.</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="voiceId">Voice Model ID (optional - leave empty for default voice):</label>
+                    <input type="text" id="voiceId" placeholder="Paste voice model ID here" />
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        💡 Upload audio above to get a voice model ID, or use an existing ID from <a href="https://fish.audio/" target="_blank">fish.audio</a>
+                    </small>
+                </div>
+                
+                <button class="test-button" onclick="generateVoice()">🎙️ Generate Voice</button>
+                
+                <div id="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>📚 Documentation</h2>
+                <p>For more information, check the following files:</p>
+                <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                    <li><strong>FINAL_STATUS.md</strong> - Current status and testing guide</li>
+                    <li><strong>SETUP_GUIDE.md</strong> - Complete API documentation</li>
+                    <li><strong>backend/README.md</strong> - Backend setup instructions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('✅ JavaScript loaded successfully!');
+        console.log('🌐 API URL:', 'http://localhost:5000');
+        const API_URL = 'http://localhost:5000';
+        
+        function showResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = isSuccess ? 'result-success' : 'result-error';
+            resultDiv.style.display = 'block';
+        }
+        
+        async function testHealth() {
+            showResult('Testing server health...');
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                showResult(`✅ Success!\n\nStatus: ${response.status}\n\n${JSON.stringify(data, null, 2)}`, true);
+            } catch (error) {
+                showResult(`❌ Error!\n\n${error.message}`, false);
+            }
+        }
+        
+        async function uploadAndSetVoice() {
+            console.log('📤 uploadAndSetVoice() called');
+            const fileInput = document.getElementById('audioFile');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                console.log('⚠️ No file selected');
+                showUploadResult('❌ Please select an audio file!', false);
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const fileSizeMB = file.size / (1024 * 1024);
+            console.log('📁 Selected file:', file.name, '- Size:', fileSizeMB.toFixed(2), 'MB');
+            
+            // Warn if file is too large (Fish.Audio limit: <270 seconds, roughly <10MB)
+            if (fileSizeMB > 10) {
+                const confirmUpload = confirm(
+                    `⚠️ WARNING: File is ${fileSizeMB.toFixed(1)}MB!\n\n` +
+                    `Fish.Audio requires audio UNDER 270 seconds (4.5 minutes).\n` +
+                    `Large files will likely be rejected.\n\n` +
+                    `Recommended: 10-30 seconds (under 1-2 MB)\n\n` +
+                    `Do you want to try uploading anyway?`
+                );
+                if (!confirmUpload) {
+                    showUploadResult('❌ Upload cancelled. Please prepare a shorter audio file (10-30 seconds recommended).', false);
+                    return;
+                }
+            }
+            
+            const formData = new FormData();
+            formData.append('audio', file);
+            formData.append('name', file.name.split('.')[0]); // Use filename as voice name
+            
+            showUploadResult('🎤 Uploading and creating voice model... (this may take 10-30 seconds)');
+            try {
+                console.log('📤 Uploading to /api/upload-reference...');
+                const response = await fetch(`${API_URL}/api/upload-reference`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('📥 Response status:', response.status);
+                const data = await response.json();
+                console.log('📦 Response data:', data);
+                
+                if (response.ok) {
+                    const modelId = data.model_id || data.reference_id || 'N/A';
+                    showUploadResult(`✅ Voice Model Created!\n\nModel ID: ${modelId}\n\nThis ID has been automatically filled below. You can now generate voices!`, true);
+                    
+                    // Auto-fill the voice model ID
+                    if (modelId !== 'N/A') {
+                        document.getElementById('voiceId').value = modelId;
+                    }
+                } else {
+                    showUploadResult(`❌ Error: ${data.error || 'Unknown error'}`, false);
+                }
+            } catch (error) {
+                showUploadResult(`❌ Error!\n\n${error.message}`, false);
+            }
+        }
+        
+        async function generateVoice() {
+            console.log('🎤 generateVoice() called');
+            const text = document.getElementById('textInput').value;
+            const voiceId = document.getElementById('voiceId').value;
+            console.log('Text:', text, 'VoiceId:', voiceId);
+            
+            if (!text.trim()) {
+                console.log('⚠️ No text entered');
+                showResult('❌ Please enter some text!', false);
+                return;
+            }
+            
+            console.log('✅ Starting voice generation...');
+            showResult('🎤 Generating voice... (this may take 10-30 seconds)');
+            try {
+                const payload = {
+                    text: text,
+                    format: 'mp3'  // Use MP3 format (Fish.Audio WAV is broken)
+                };
+                
+                // Add voice_id if provided
+                if (voiceId && voiceId.trim()) {
+                    payload.reference_id = voiceId.trim();
+                    console.log('📝 Using voice model:', voiceId.trim());
+                }
+                
+                console.log('📤 Sending request with payload:', payload);
+                const response = await fetch(`${API_URL}/api/synthesize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                console.log('📥 Response status:', response.status);
+                const data = await response.json();
+                console.log('📦 Response data:', data);
+                
+                if (response.ok) {
+                    const voiceType = voiceId ? `🎭 with custom voice (${voiceId.substring(0, 8)}...)` : '🔊 with default voice';
+                    const fileName = data.audio_path.split('\\').pop().split('/').pop();
+                    
+                    showResult(`✅ Voice Generated Successfully ${voiceType}!\n\n📁 File: ${fileName}\n📂 Path: ${data.audio_path}\n\n🎧 You can play this MP3 file with any media player!`, true);
+                } else {
+                    showResult(`❌ Error: ${data.error || 'Unknown error'}`, false);
+                }
+            } catch (error) {
+                showResult(`❌ Error!\n\n${error.message}`, false);
+            }
+        }
+        
+        function showUploadResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.textContent = message;
+            resultDiv.className = isSuccess ? 'result-success' : 'result-error';
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
