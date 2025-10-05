@@ -8,11 +8,12 @@ import {
     TouchableOpacity,
     Animated,
     TextInput,
-    Alert,
+    Alert, Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 // Assuming this path is correct for your file structure
 import echoes from '../../dummyJson/echoes.json';
+const TAB_BAR_HEIGHT_SPACE = Platform.OS === 'ios' ? 120 : 100;
 
 const { width, height } = Dimensions.get('window');
 
@@ -272,24 +273,34 @@ const ShareScreen: React.FC = () => {
             <View style={[styles.circle, styles.circleTwo]} />
             <View style={[styles.circle, styles.circleThree]} />
 
-            <Animated.View
-                style={[
-                    styles.header,
-                    {
-                        opacity: fadeAnim,
-                        transform: [{ translateY: slideAnim }],
-                    },
-                ]}
-            >
-                <Text style={styles.title}>Share Echoes</Text>
-                <Text style={styles.subtitle}>Spread the love and keep memories alive</Text>
-            </Animated.View>
+
 
             <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+
             >
+
+                <Animated.View
+                    style={[
+                        styles.header,
+                        {
+                            opacity: fadeAnim,
+                            transform: [{ translateY: slideAnim }],
+                        },
+                    ]}
+                >
+                    <Text style={styles.title}>Share Echoes</Text>
+                    <Ionicons
+                        name="share" // Suitable timeline/date icon
+                        size={28}
+                        color="#B7A9C9"
+                        style={styles.timelineIcon}
+                    />
+                    <Text style={styles.subtitle}>Spread the love and keep memories alive</Text>
+                </Animated.View>
+
                 {/* Memory Selection */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Select Echo to Share</Text>
@@ -415,7 +426,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingBottom: 40,
+        paddingBottom: TAB_BAR_HEIGHT_SPACE - 20,
     },
 
     // Sections
@@ -597,6 +608,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 8,
         right: 8,
+    },
+    timelineIcon: {
+        marginBottom: 10,
     },
 });
 

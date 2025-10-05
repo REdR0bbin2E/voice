@@ -1,11 +1,13 @@
 // app/(app)/(tabs)/EchoesMessaging.tsx
 
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Platform } from "react-native";
 import { useRouter } from 'expo-router';
 
 // ⚠️ NEW: Import the dummy data from the specified location
 import DUMMY_ECHOS from "../../dummyJson/echoes.json";
+import { Ionicons } from "@expo/vector-icons";
+const TAB_BAR_HEIGHT_SPACE = Platform.OS === 'ios' ? 120 : 100;
 
 const { width, height } = Dimensions.get("window");
 
@@ -75,6 +77,12 @@ const EchoesMessaging: React.FC = () => {
                 ListHeaderComponent={
                     <View style={styles.headerContainer}>
                         <Text style={styles.title}>Your Echoes</Text>
+                        <Ionicons
+                            name="logo-soundcloud" // Suitable timeline/date icon
+                            size={28}
+                            color="#B7A9C9"
+                            style={{ marginBottom: 10 }}
+                        />
                         <Text style={styles.subtitle}>Voices that matter most</Text>
                     </View>
                 }
@@ -91,6 +99,8 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#F6F1E9",
         paddingHorizontal: 16,
+        paddingBottom: TAB_BAR_HEIGHT_SPACE - 20,
+
     },
     backgroundOverlay: {
         position: "absolute",

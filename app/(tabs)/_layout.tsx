@@ -33,14 +33,17 @@ export default function TabLayout() {
         tabBarStyle: {
           // General Style
           backgroundColor: BACKGROUND_COLOR,
-          height: Platform.OS === 'ios' ? 90 : 60, // Increase height for safety area on iOS
+          borderColor: "rgba(252, 157, 157, 1)",
+          borderWidth: 4,
+
+          height: Platform.OS === 'ios' ? 75 : 60, // Increase height for safety area on iOS
           paddingTop: 10,
-          paddingBottom: Platform.OS === 'ios' ? 30 : 5, // Padding for safe area on iOS
+          paddingBottom: Platform.OS === 'ios' ? 20 : 5, // Padding for safe area on iOS
 
           // Floating/Card Style
           position: 'absolute',
           marginHorizontal: 15,
-          marginBottom: Platform.OS === 'ios' ? 25 : 15,
+          marginBottom: Platform.OS === 'ios' ? 15 : 15,
           borderRadius: 20,
           borderTopWidth: 0, // Ensure no default border line is visible
           shadowColor: '#000',
@@ -95,7 +98,6 @@ export default function TabLayout() {
         }}
       />
 
-<<<<<<< HEAD
       <Tabs.Screen
         name="timeline" // Assuming you have a timeline.tsx file
         options={{
@@ -105,15 +107,14 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="share" // Assuming you have a share.tsx file (ShareScreen)
+        name="share" // Assuming you have a timeline.tsx file
         options={{
           title: 'Share',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="square.and.arrow.up.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="arrow.up" color={color} />,
         }}
       />
 
-=======
->>>>>>> b0e1174461ecb9a0b796c7f5334704494a9e0d12
+
     </Tabs>
   );
 }

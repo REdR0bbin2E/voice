@@ -9,10 +9,19 @@ import {
     Modal,
     TextInput,
     Dimensions,
+    Image,
+    Alert, // 💡 Added for permission handling
+    Platform // 💡 Added for permission handling
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from 'expo-image-picker';
+// If you want a true video preview, consider installing expo-av and uncommenting:
+// import { Video } from 'expo-av';
 
 const { width, height } = Dimensions.get("window");
+
+// 💡 Define a type for the media state
+type MediaType = 'video' | 'image' | null;
 
 const HomeScreen: React.FC = () => {
     const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -21,13 +30,61 @@ const HomeScreen: React.FC = () => {
     const [description, setDescription] = useState("");
     const [audio, setAudio] = useState<string | null>(null);
 
-    // Ripple animations
+    // 💡 RENAMED: Use mediaUri for the file path
+    const [mediaUri, setMediaUri] = useState<string | null>(null);
+    // 💡 NEW STATE: To track the type of media selected (image or video)
+    const [mediaType, setMediaType] = useState<MediaType>(null);
+
+
+    // 💡 ADDED: Request media library permissions
+    useEffect(() => {
+        (async () => {
+            if (Platform.OS !== 'web') {
+                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                if (status !== 'granted') {
+                    Alert.alert('Permission required', 'We need camera roll permissions to select videos and images.');
+                }
+            }
+        })();
+    }, []);
+
+    // 💡 UPDATED: Function to handle picking video/image
+    const pickMedia = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                // Use MediaTypeOptions provided by expo-image-picker
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const asset = result.assets[0];
+                setMediaUri(asset.uri);
+
+                if (asset.type === 'video') {
+                    setMediaType('video');
+                } else if (asset.type === 'image') {
+                    setMediaType('image');
+                } else {
+                    setMediaType(null);
+                }
+            }
+        } catch (e) {
+            console.log('pickMedia error', e);
+            Alert.alert('Error', 'Unable to pick media.');
+        }
+    };
+
+    // Ripple animations (kept original logic)
     const ripple1 = useRef(new Animated.Value(0)).current;
     const ripple2 = useRef(new Animated.Value(0)).current;
     const ripple3 = useRef(new Animated.Value(0)).current;
     const ripple1Opacity = useRef(new Animated.Value(1)).current;
     const ripple2Opacity = useRef(new Animated.Value(1)).current;
     const ripple3Opacity = useRef(new Animated.Value(1)).current;
+
 
     useEffect(() => {
         Animated.timing(fadeAnim, {
@@ -85,12 +142,51 @@ const HomeScreen: React.FC = () => {
             name,
             description,
             audio,
+            mediaUri, // 💡 LOGGING NEW MEDIA STATE
+            mediaType
         });
         setModalVisible(false);
         setName("");
         setDescription("");
         setAudio(null);
+        setMediaUri(null); // 💡 CLEAR NEW MEDIA STATE
+        setMediaType(null); // 💡 CLEAR NEW MEDIA TYPE STATE
     };
+
+    // 💡 HELPER COMPONENT FOR MEDIA PREVIEW
+    const MediaPreview = () => {
+        if (!mediaUri) return null;
+
+        if (mediaType === 'image') {
+            return (
+                <View style={styles.mediaPreviewContainer}>
+                    <Image source={{ uri: mediaUri }} style={styles.mediaPreview} />
+                </View>
+            );
+        }
+
+        if (mediaType === 'video') {
+            // If you install expo-av, uncomment the Video component. 
+            // For now, we'll just show a placeholder or the video's thumbnail (which ImagePicker often provides).
+            return (
+                <View style={styles.mediaPreviewContainer}>
+                    <Ionicons name="videocam-outline" size={60} color="#E6AFA4" />
+                    <Text style={styles.mediaTypeLabel}>Video Selected</Text>
+                    {/* <Video
+                        source={{ uri: mediaUri }}
+                        style={styles.mediaPreview}
+                        useNativeControls
+                        resizeMode="cover"
+                        isLooping
+                    /> 
+                    */}
+                </View>
+            );
+        }
+
+        return null;
+    }
+
 
     return (
         <View style={styles.container}>
@@ -132,7 +228,7 @@ const HomeScreen: React.FC = () => {
             {/* Splash overlay */}
             <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
                 <View style={styles.splashLogoCircle}>
-                    <Text style={styles.splashLogoText}>E</Text>
+                    <Image source={require('../../assets/images/echoTempLogo.png')} resizeMode='contain' style={{ width: 175, height: 175 }} />
                 </View>
                 <Text style={styles.welcomeText}>Welcome to Echo</Text>
             </Animated.View>
@@ -140,11 +236,7 @@ const HomeScreen: React.FC = () => {
             {/* Content */}
             <View style={styles.content}>
                 <View style={styles.logoSection}>
-                    <View style={styles.logoCircle}>
-                        <Text style={styles.logoText}>E</Text>
-                    </View>
-                    <Text style={styles.brandName}>Echo</Text>
-                    <Text style={styles.tagline}>Create meaningful connections</Text>
+                    <Text style={styles.tagline}>Remember Them</Text>
                 </View>
 
                 {/* Plus button */}
@@ -192,6 +284,18 @@ const HomeScreen: React.FC = () => {
                             />
                         </View>
 
+                        {/* 💡 NEW: Button to pick Video/Image */}
+                        <TouchableOpacity style={styles.mediaButton} onPress={pickMedia}>
+                            <Ionicons name={mediaUri ? "videocam" : "videocam-outline"} size={22} color="#FFF" />
+                            <Text style={styles.mediaButtonText}>
+                                {mediaUri ? `${mediaType === 'video' ? 'Video' : 'Image'} Selected` : "Select a video or image"}
+                            </Text>
+                            <Ionicons name="folder-open-outline" size={22} color="#FFF" style={styles.uploadIcon} />
+                        </TouchableOpacity>
+
+                        {/* 💡 NEW: Media Preview */}
+                        <MediaPreview />
+
                         <TouchableOpacity style={styles.audioButton} onPress={handleAudioPick}>
                             <Ionicons name="musical-notes" size={22} color="#FFF" />
                             <Text style={styles.audioButtonText}>
@@ -227,7 +331,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F6F1E9",
     },
 
-    // Background circles
+    // Background circles (No changes)
     circle: {
         position: "absolute",
         borderRadius: 9999,
@@ -264,7 +368,7 @@ const styles = StyleSheet.create({
         opacity: 0.08,
     },
 
-    // Animated ripples
+    // Animated ripples (No changes)
     ripple: {
         position: "absolute",
         width: 300,
@@ -278,7 +382,7 @@ const styles = StyleSheet.create({
         marginTop: -150,
     },
 
-    // Splash overlay
+    // Splash overlay (No changes)
     overlay: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: "#E6AFA4",
@@ -299,11 +403,6 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 4 },
     },
-    splashLogoText: {
-        fontSize: 56,
-        fontWeight: "700",
-        color: "#E6AFA4",
-    },
     welcomeText: {
         fontSize: 32,
         fontWeight: "700",
@@ -311,43 +410,17 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
 
-    // Content
+    // Content (No changes)
     content: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
     },
 
-    // Logo section
+    // Logo section (No changes)
     logoSection: {
         alignItems: "center",
         marginBottom: 60,
-    },
-    logoCircle: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
-        backgroundColor: "#E6AFA4",
-        justifyContent: "center",
-        alignItems: "center",
-        marginBottom: 20,
-        shadowColor: "#E6AFA4",
-        shadowOpacity: 0.4,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
-        elevation: 5,
-    },
-    logoText: {
-        fontSize: 48,
-        fontWeight: "700",
-        color: "#FFF",
-    },
-    brandName: {
-        fontSize: 36,
-        fontWeight: "700",
-        color: "#B7A9C9",
-        letterSpacing: 1,
-        marginBottom: 8,
     },
     tagline: {
         fontSize: 15,
@@ -356,7 +429,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
 
-    // Plus button
+    // Plus button (No changes)
     plusButton: {
         width: 90,
         height: 90,
@@ -378,7 +451,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
 
-    // Modal
+    // Modal (No changes)
     modalOverlay: {
         flex: 1,
         backgroundColor: "rgba(0,0,0,0.6)",
@@ -405,7 +478,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
 
-    // Input fields
+    // Input fields (No changes)
     inputContainer: {
         marginBottom: 18,
     },
@@ -430,15 +503,61 @@ const styles = StyleSheet.create({
         textAlignVertical: "top",
     },
 
-    // Audio button
+    // 💡 NEW: Media Button styles
+    mediaButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#E8C07D", // Different color for distinction
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 10,
+        shadowColor: "#E8C07D",
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 3 },
+        elevation: 3,
+    },
+    mediaButtonText: {
+        color: "#FFF",
+        fontSize: 15,
+        fontWeight: "500",
+        marginLeft: 10,
+        flex: 1,
+    },
+
+    // 💡 NEW: Media Preview styles
+    mediaPreviewContainer: {
+        width: '100%',
+        height: 150,
+        marginBottom: 20,
+        borderRadius: 12,
+        overflow: 'hidden',
+        backgroundColor: '#FAFAFA',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E5E5E5',
+    },
+    mediaPreview: {
+        width: '100%',
+        height: '100%',
+        // Use Image.resizeMode if using Image, not needed for Video.
+    },
+    mediaTypeLabel: {
+        color: '#E6AFA4',
+        marginTop: 5,
+        fontWeight: '600'
+    },
+
+    // Audio button (No changes)
     audioButton: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#E6AFA4",
+        backgroundColor: "#B7A9C9", // Changed color for distinction
         padding: 16,
         borderRadius: 12,
         marginBottom: 20,
-        shadowColor: "#E6AFA4",
+        shadowColor: "#B7A9C9",
         shadowOpacity: 0.3,
         shadowRadius: 6,
         shadowOffset: { width: 0, height: 3 },
@@ -455,7 +574,7 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
 
-    // Modal actions
+    // Modal actions (No changes)
     modalActions: {
         flexDirection: "row",
         justifyContent: "flex-end",

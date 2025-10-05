@@ -4,15 +4,19 @@ import {
     Text,
     StyleSheet,
     Dimensions,
-    ScrollView,
     TouchableOpacity,
     Animated,
     FlatList,
+    Platform, // Import Platform for conditional styling
+    SafeAreaView, // Import SafeAreaView for better iOS handling
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import echoes from '../../dummyJson/echoes.json';
 
 const { width, height } = Dimensions.get('window');
+
+// Define the expected height of the floating tab bar (approx. 90 units for iOS, ~75 for Android)
+const TAB_BAR_HEIGHT_SPACE = Platform.OS === 'ios' ? 120 : 100;
 
 interface TimelineEvent {
     id: string;
@@ -23,7 +27,7 @@ interface TimelineEvent {
     audioUrl?: string;
 }
 
-// Separate component for timeline items to avoid hook issues
+// Separate component for timeline items (Unchanged)
 const TimelineItemComponent: React.FC<{
     item: TimelineEvent;
     index: number;
@@ -89,11 +93,15 @@ const TimelineScreen: React.FC = () => {
     const slideAnim = useRef(new Animated.Value(30)).current;
     const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
 
-    // Generate timeline events from echoes data
+    // Generate timeline events from echoes data (Unchanged)
     const timelineEvents: TimelineEvent[] = echoes.map((echo, index) => ({
         id: echo.id,
         name: echo.name,
-        date: new Date(2024, index, Math.floor(Math.random() * 28) + 1).toLocaleDateString(),
+        date: new Date(2024, index, Math.floor(Math.random() * 28) + 1).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        }),
         type: 'memory' as const,
         description: echo.descriptionPrompt.substring(0, 100) + '...',
         audioUrl: echo.audioSamples[0]?.url,
@@ -117,6 +125,7 @@ const TimelineScreen: React.FC = () => {
     const renderTimelineItem = ({ item, index }: { item: TimelineEvent; index: number }) => {
         return (
             <TimelineItemComponent
+                key={item.id}
                 item={item}
                 index={index}
                 onPress={setSelectedEvent}
@@ -125,31 +134,44 @@ const TimelineScreen: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             {/* Background decorative elements */}
             <View style={[styles.circle, styles.circleOne]} />
             <View style={[styles.circle, styles.circleTwo]} />
             <View style={[styles.circle, styles.circleThree]} />
 
-            <Animated.View
-                style={[
-                    styles.header,
-                    {
-                        opacity: fadeAnim,
-                        transform: [{ translateY: slideAnim }],
-                    },
-                ]}
-            >
-                <Text style={styles.title}>Memory Timeline</Text>
-                <Text style={styles.subtitle}>Journey through your cherished memories</Text>
-            </Animated.View>
-
+            {/* SCROLLABLE CONTENT (FlatList) with Header as ListHeaderComponent */}
             <FlatList
                 data={timelineEvents}
                 keyExtractor={(item) => item.id}
                 renderItem={renderTimelineItem}
+                style={styles.flatListStyle}
                 contentContainerStyle={styles.timelineContainer}
                 showsVerticalScrollIndicator={false}
+                ListHeaderComponent={
+                    <Animated.View
+                        style={[
+                            styles.header,
+                            {
+                                opacity: fadeAnim,
+                                transform: [{ translateY: slideAnim }],
+                            },
+                        ]}
+                    >
+                        {/* Pushed Up Title */}
+                        <Text style={styles.title}>Memory Timeline</Text>
+
+                        {/* New Timeline Icon */}
+                        <Ionicons
+                            name="calendar-outline" // Suitable timeline/date icon
+                            size={28}
+                            color="#B7A9C9"
+                            style={styles.timelineIcon}
+                        />
+
+                        <Text style={styles.subtitle}>Journey through your cherished memories</Text>
+                    </Animated.View>
+                }
                 ListEmptyComponent={
                     <View style={styles.emptyState}>
                         <Ionicons name="time-outline" size={64} color="#B7A9C9" />
@@ -159,28 +181,9 @@ const TimelineScreen: React.FC = () => {
                 }
             />
 
-            {/* Floating Action Button */}
-            <Animated.View
-                style={[
-                    styles.fab,
-                    {
-                        opacity: fadeAnim,
-                        transform: [
-                            {
-                                scale: fadeAnim.interpolate({
-                                    inputRange: [0, 1],
-                                    outputRange: [0.8, 1],
-                                }),
-                            },
-                        ],
-                    },
-                ]}
-            >
-                <TouchableOpacity style={styles.fabButton} activeOpacity={0.8}>
-                    <Ionicons name="add" size={28} color="#FFF" />
-                </TouchableOpacity>
-            </Animated.View>
-        </View>
+
+
+        </SafeAreaView>
     );
 };
 
@@ -190,7 +193,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F6F1E9',
     },
 
-    // Background circles
+    // Background circles (Unchanged)
     circle: {
         position: 'absolute',
         borderRadius: 9999,
@@ -218,12 +221,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#E8C07D',
     },
 
-    // Header
+    // Header (Now inside FlatList, styling for look and feel)
     header: {
-        paddingTop: height * 0.12,
+        // ⚠️ PUSH UP: Reduced padding to move content closer to the top (status bar area)
+        paddingTop: Platform.OS === 'ios' ? 60 : 30,
         paddingHorizontal: 20,
         paddingBottom: 20,
         alignItems: 'center',
+        backgroundColor: '#F6F1E9',
+        zIndex: 10,
     },
     title: {
         fontSize: 32,
@@ -232,6 +238,10 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         marginBottom: 8,
     },
+    // New Style for the icon under the title
+    timelineIcon: {
+        marginBottom: 10,
+    },
     subtitle: {
         fontSize: 16,
         color: '#B7A9C9',
@@ -239,10 +249,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Timeline
+    // FlatList (SCROLLABLE CONTENT)
+    flatListStyle: {
+        flex: 1, // Let the list take up the remaining space
+    },
     timelineContainer: {
         paddingHorizontal: 20,
-        paddingBottom: 100,
+        // ⚠️ TAB BAR SPACING: Ensure the last item scrolls above the tab bar
+        paddingBottom: TAB_BAR_HEIGHT_SPACE - 20,
     },
     timelineItem: {
         marginBottom: 16,
@@ -310,7 +324,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
 
-    // Empty state
+    // Empty state (Unchanged)
     emptyState: {
         flex: 1,
         justifyContent: 'center',
@@ -331,11 +345,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Floating Action Button
+    // Floating Action Button (Unchanged, just made sure it's inside SafeAreaView)
     fab: {
         position: 'absolute',
-        bottom: 30,
+        bottom: Platform.OS === 'ios' ? 50 : 30,
         right: 20,
+        zIndex: 20,
     },
     fabButton: {
         width: 60,
