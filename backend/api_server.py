@@ -113,14 +113,18 @@ def upload_reference():
         audio_file.save(str(temp_path))
         
         # Upload to Fish.Audio
-        reference_id = voice_service.upload_reference_audio(str(temp_path), name)
+        result = voice_service.upload_reference_audio(str(temp_path), name)
         
         # Clean up temp file
         temp_path.unlink()
         
+        # Extract model_id from result (voice_service returns a dict)
+        model_id = result.get('model_id') or result.get('reference_id') if isinstance(result, dict) else result
+        
         return jsonify({
             "success": True,
-            "reference_id": reference_id,
+            "model_id": model_id,
+            "reference_id": model_id,
             "message": "Reference audio uploaded successfully"
         }), 201
         
@@ -224,8 +228,8 @@ if __name__ == '__main__':
         app.run(
             host=Config.API_HOST,
             port=Config.API_PORT,
-            debug=True,
-            use_reloader=False,  # Disable reloader to prevent socket issues on Windows
+            debug=False,  # DEBUG OFF - prevents crashes on Windows
+            use_reloader=False,
             threaded=True
         )
     except KeyboardInterrupt:

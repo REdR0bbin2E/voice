@@ -3,7 +3,7 @@ import datetime
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from .config import Config
+from config import Config
 
 # Load environment variables from .env file
 load_dotenv()

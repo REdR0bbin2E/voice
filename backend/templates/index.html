@@ -139,6 +139,17 @@
             display: none;
         }
         
+        #uploadResult {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            display: none;
+        }
+        
         .result-success {
             background: #d4edda;
             border-left: 4px solid #28a745;
@@ -170,6 +181,17 @@
             font-family: inherit;
         }
         
+        .input-group input[type="file"] {
+            border: 2px dashed #ddd;
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+        
+        .input-group input[type="file"]:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+        
         .input-group textarea {
             resize: vertical;
             min-height: 80px;
@@ -190,44 +212,41 @@
             </div>
             
             <div class="section">
-                <h2>📡 Available Endpoints</h2>
+                <h2>🎙️ Voice Cloning Setup (Optional)</h2>
+                <p style="color: #666; margin-bottom: 15px;">Upload reference audio to create a custom voice model, or use a voice model ID from <a href="https://fish.audio/" target="_blank">Fish.Audio</a></p>
                 
-                <div class="endpoint">
-                    <div class="endpoint-title">GET /health</div>
-                    <div class="endpoint-path">http://localhost:5000/health</div>
-                    <div class="endpoint-desc">Check server health status</div>
+                <div class="input-group">
+                    <label for="audioFile">Upload Reference Audio (.wav, .mp3):</label>
+                    <input type="file" id="audioFile" accept="audio/*" />
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">Upload 10-30 seconds of clear audio. This will create a voice model on Fish.Audio.</small>
                 </div>
                 
-                <div class="endpoint">
-                    <div class="endpoint-title">POST /api/synthesize</div>
-                    <div class="endpoint-path">http://localhost:5000/api/synthesize</div>
-                    <div class="endpoint-desc">Generate speech from text using Fish.Audio</div>
+                <button class="test-button" onclick="uploadAndSetVoice()">Upload & Create Voice Model</button>
+                
+                <div style="margin: 20px 0; padding: 15px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                    <strong>OR</strong> paste an existing voice model ID below (skip upload if you already have one)
                 </div>
                 
-                <div class="endpoint">
-                    <div class="endpoint-title">GET /api/voices</div>
-                    <div class="endpoint-path">http://localhost:5000/api/voices</div>
-                    <div class="endpoint-desc">Get list of available voices</div>
-                </div>
-                
-                <div class="endpoint">
-                    <div class="endpoint-title">POST /api/upload-reference</div>
-                    <div class="endpoint-path">http://localhost:5000/api/upload-reference</div>
-                    <div class="endpoint-desc">Upload reference audio for voice cloning</div>
-                </div>
+                <div id="uploadResult"></div>
             </div>
             
             <div class="section">
-                <h2>🧪 Test Voice Synthesis</h2>
+                <h2>🎤 Generate Voice</h2>
                 
                 <div class="input-group">
                     <label for="textInput">Text to synthesize:</label>
                     <textarea id="textInput" placeholder="Enter text here...">Hello! This is a test of the Echo voice system.</textarea>
                 </div>
                 
-                <button class="test-button" onclick="testHealth()">Test Health</button>
-                <button class="test-button" onclick="testSynthesize()">Generate Voice</button>
-                <button class="test-button" onclick="testVoices()">Get Voices</button>
+                <div class="input-group">
+                    <label for="voiceId">Voice Model ID (optional - leave empty for default voice):</label>
+                    <input type="text" id="voiceId" placeholder="Paste voice model ID here" />
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        💡 Upload audio above to get a voice model ID, or use an existing ID from <a href="https://fish.audio/" target="_blank">fish.audio</a>
+                    </small>
+                </div>
+                
+                <button class="test-button" onclick="generateVoice()">🎙️ Generate Voice</button>
                 
                 <div id="result"></div>
             </div>
@@ -245,6 +264,8 @@
     </div>
     
     <script>
+        console.log('✅ JavaScript loaded successfully!');
+        console.log('🌐 API URL:', 'http://localhost:5000');
         const API_URL = 'http://localhost:5000';
         
         function showResult(message, isSuccess = true) {
@@ -265,30 +286,94 @@
             }
         }
         
-        async function testSynthesize() {
+        async function uploadAndSetVoice() {
+            console.log('📤 uploadAndSetVoice() called');
+            const fileInput = document.getElementById('audioFile');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                console.log('⚠️ No file selected');
+                showUploadResult('❌ Please select an audio file!', false);
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            console.log('📁 Selected file:', file.name, '- Size:', file.size, 'bytes');
+            const formData = new FormData();
+            formData.append('audio', file);
+            formData.append('name', file.name.split('.')[0]); // Use filename as voice name
+            
+            showUploadResult('🎤 Uploading and creating voice model... (this may take 10-30 seconds)');
+            try {
+                console.log('📤 Uploading to /api/upload-reference...');
+                const response = await fetch(`${API_URL}/api/upload-reference`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('📥 Response status:', response.status);
+                const data = await response.json();
+                console.log('📦 Response data:', data);
+                
+                if (response.ok) {
+                    const modelId = data.model_id || data.reference_id || 'N/A';
+                    showUploadResult(`✅ Voice Model Created!\n\nModel ID: ${modelId}\n\nThis ID has been automatically filled below. You can now generate voices!`, true);
+                    
+                    // Auto-fill the voice model ID
+                    if (modelId !== 'N/A') {
+                        document.getElementById('voiceId').value = modelId;
+                    }
+                } else {
+                    showUploadResult(`❌ Error: ${data.error || 'Unknown error'}`, false);
+                }
+            } catch (error) {
+                showUploadResult(`❌ Error!\n\n${error.message}`, false);
+            }
+        }
+        
+        async function generateVoice() {
+            console.log('🎤 generateVoice() called');
             const text = document.getElementById('textInput').value;
+            const voiceId = document.getElementById('voiceId').value;
+            console.log('Text:', text, 'VoiceId:', voiceId);
+            
             if (!text.trim()) {
+                console.log('⚠️ No text entered');
                 showResult('❌ Please enter some text!', false);
                 return;
             }
             
-            showResult('Generating voice... (this may take 10-30 seconds)');
+            console.log('✅ Starting voice generation...');
+            showResult('🎤 Generating voice... (this may take 10-30 seconds)');
             try {
+                const payload = {
+                    text: text,
+                    format: 'mp3'  // Use MP3 format (Fish.Audio WAV is broken)
+                };
+                
+                // Add voice_id if provided
+                if (voiceId && voiceId.trim()) {
+                    payload.reference_id = voiceId.trim();
+                    console.log('📝 Using voice model:', voiceId.trim());
+                }
+                
+                console.log('📤 Sending request with payload:', payload);
                 const response = await fetch(`${API_URL}/api/synthesize`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        text: text,
-                        format: 'wav'
-                    })
+                    body: JSON.stringify(payload)
                 });
                 
+                console.log('📥 Response status:', response.status);
                 const data = await response.json();
+                console.log('📦 Response data:', data);
                 
                 if (response.ok) {
-                    showResult(`✅ Voice Generated Successfully!\n\nAudio file saved to:\n${data.audio_path}\n\nYou can play this file with any audio player!`, true);
+                    const voiceType = voiceId ? `🎭 with custom voice (${voiceId.substring(0, 8)}...)` : '🔊 with default voice';
+                    const fileName = data.audio_path.split('\\').pop().split('/').pop();
+                    
+                    showResult(`✅ Voice Generated Successfully ${voiceType}!\n\n📁 File: ${fileName}\n📂 Path: ${data.audio_path}\n\n🎧 You can play this MP3 file with any media player!`, true);
                 } else {
                     showResult(`❌ Error: ${data.error || 'Unknown error'}`, false);
                 }
@@ -297,24 +382,12 @@
             }
         }
         
-        async function testVoices() {
-            showResult('Fetching available voices...');
-            try {
-                const response = await fetch(`${API_URL}/api/voices`);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showResult(`✅ Success!\n\n${JSON.stringify(data, null, 2)}`, true);
-                } else {
-                    showResult(`⚠️ Response (${response.status}):\n\n${JSON.stringify(data, null, 2)}`, false);
-                }
-            } catch (error) {
-                showResult(`❌ Error!\n\n${error.message}`, false);
-            }
+        function showUploadResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.textContent = message;
+            resultDiv.className = isSuccess ? 'result-success' : 'result-error';
+            resultDiv.style.display = 'block';
         }
-        
-        // Test health on page load
-        window.addEventListener('load', testHealth);
     </script>
 </body>
 </html>

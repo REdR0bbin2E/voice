@@ -5,7 +5,6 @@ import { Platform } from 'react-native'; // Import Platform for conditional styl
 // Assuming these imports are correctly aliased in your project
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol'; // Using IconSymbol for SF Symbols
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
@@ -95,7 +94,6 @@ export default function TabLayout() {
         }}
       />
 
-<<<<<<< HEAD
       <Tabs.Screen
         name="timeline" // Assuming you have a timeline.tsx file
         options={{
@@ -112,8 +110,6 @@ export default function TabLayout() {
         }}
       />
 
-=======
->>>>>>> b0e1174461ecb9a0b796c7f5334704494a9e0d12
     </Tabs>
   );
 }
