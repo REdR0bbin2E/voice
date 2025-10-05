@@ -216,6 +216,14 @@
                 <p style="color: #666; margin-bottom: 15px;">Upload reference audio to create a custom voice model, or use a voice model ID from <a href="https://fish.audio/" target="_blank">Fish.Audio</a></p>
                 
                 <div class="input-group">
+                    <label for="userId">User ID (optional - for database tracking):</label>
+                    <input type="text" id="userId" placeholder="Enter MongoDB User ObjectId (optional)" />
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        💾 If provided, the voice model will be saved to the database and linked to your user account.
+                    </small>
+                </div>
+                
+                <div class="input-group">
                     <label for="audioFile">Upload Reference Audio (.wav, .mp3):</label>
                     <input type="file" id="audioFile" accept="audio/*" />
                     <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
@@ -292,6 +300,7 @@
         async function uploadAndSetVoice() {
             console.log('📤 uploadAndSetVoice() called');
             const fileInput = document.getElementById('audioFile');
+            const userIdInput = document.getElementById('userId');
             
             if (!fileInput.files || fileInput.files.length === 0) {
                 console.log('⚠️ No file selected');
@@ -300,8 +309,12 @@
             }
             
             const file = fileInput.files[0];
+            const userId = userIdInput.value.trim();
             const fileSizeMB = file.size / (1024 * 1024);
             console.log('📁 Selected file:', file.name, '- Size:', fileSizeMB.toFixed(2), 'MB');
+            if (userId) {
+                console.log('👤 User ID:', userId);
+            }
             
             // Warn if file is too large (Fish.Audio limit: <270 seconds, roughly <10MB)
             if (fileSizeMB > 10) {
@@ -322,6 +335,11 @@
             formData.append('audio', file);
             formData.append('name', file.name.split('.')[0]); // Use filename as voice name
             
+            // Add user_id if provided (for database tracking)
+            if (userId) {
+                formData.append('user_id', userId);
+            }
+            
             showUploadResult('🎤 Uploading and creating voice model... (this may take 10-30 seconds)');
             try {
                 console.log('📤 Uploading to /api/upload-reference...');
@@ -336,7 +354,17 @@
                 
                 if (response.ok) {
                     const modelId = data.model_id || data.reference_id || 'N/A';
-                    showUploadResult(`✅ Voice Model Created!\n\nModel ID: ${modelId}\n\nThis ID has been automatically filled below. You can now generate voices!`, true);
+                    let message = `✅ Voice Model Created!\n\nModel ID: ${modelId}\n\n`;
+                    
+                    // Show database save status if applicable
+                    if (data.database_record) {
+                        message += `💾 Saved to database!\nDatabase ID: ${data.database_record._id}\n\n`;
+                    } else if (userId) {
+                        message += `⚠️ Not saved to database (check MongoDB connection)\n\n`;
+                    }
+                    
+                    message += 'This ID has been automatically filled below. You can now generate voices!';
+                    showUploadResult(message, true);
                     
                     // Auto-fill the voice model ID
                     if (modelId !== 'N/A') {

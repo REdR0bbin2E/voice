@@ -1,9 +1,9 @@
 // app/(app)/chat/[id].tsx
 
-import React, { useLayoutEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Dimensions, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
+import React, { useLayoutEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // 💡 ASSUMPTION: You have created a file at this path with the JSON content you provided.
 // Load dummy JSON. Use require to avoid TS JSON module issues and ensure correct relative path.
@@ -35,7 +35,7 @@ const ChatScreen: React.FC = () => {
         return (
             <View style={[styles.container, styles.centerContent]}>
                 <Text style={styles.errorText}>Loading or Echo not found...</Text>
-                <ActivityIndicator size="large" color="#556ee6" />
+                <ActivityIndicator size="large" color="#798cebff" />
             </View>
         );
     }
@@ -60,7 +60,7 @@ const ChatScreen: React.FC = () => {
             headerTitle: name,
             headerTintColor: '#333',
             headerStyle: {
-                backgroundColor: '#FFF',
+                backgroundColor: '#e5c4c4ff',
             },
             headerRight: () => (
                 <TouchableOpacity onPress={() => console.log('Settings Pressed')} style={{ paddingHorizontal: 5 }}>
@@ -174,7 +174,7 @@ const ChatScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9f9f9', // Lighter, modern chat background
+        backgroundColor: '#deb9b9ff', // Lighter, modern chat background
     },
     centerContent: {
         justifyContent: 'center',
@@ -240,9 +240,9 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         paddingHorizontal: 10,
         paddingVertical: 8,
-        backgroundColor: '#FFF',
+        backgroundColor: '#e0bfbfff',
         borderTopWidth: 1,
-        borderTopColor: '#EEE',
+        borderTopColor: '#e0bfbfff',
     },
     micButton: {
         width: 44,
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
         borderRadius: 22,
         marginRight: 8,
         // Optional: Add a subtle background color to the button itself
-        // backgroundColor: '#F0F3FF', 
+        // backgroundColor: '#e0bfbfff', 
     },
     textInput: {
         flex: 1,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         paddingTop: Platform.OS === 'ios' ? 10 : 8,
         paddingBottom: Platform.OS === 'ios' ? 10 : 8,
-        backgroundColor: '#F0F0F0',
+        backgroundColor: '#ebebebff',
         borderRadius: 22, // Match the button radius
         fontSize: 16,
         marginRight: 8,

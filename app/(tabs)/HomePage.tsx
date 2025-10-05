@@ -1,20 +1,25 @@
 // HomeScreen.tsx
+import { Ionicons } from "@expo/vector-icons";
+import * as DocumentPicker from 'expo-document-picker'; // 💡 Added for audio picking
+import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from "react";
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
+    ActivityIndicator // 💡 Added for loading state
+    ,
+
+
+    Alert,
     Animated,
-    Modal,
-    TextInput,
     Dimensions,
     Image,
-    Alert, // 💡 Added for permission handling
-    Platform // 💡 Added for permission handling
+    Modal, // 💡 Added for permission handling
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from 'expo-image-picker';
 // If you want a true video preview, consider installing expo-av and uncommenting:
 // import { Video } from 'expo-av';
 
@@ -29,6 +34,9 @@ const HomeScreen: React.FC = () => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [audio, setAudio] = useState<string | null>(null);
+    const [audioUri, setAudioUri] = useState<string | null>(null); // 💡 NEW: Store audio file URI
+    const [isUploadingAudio, setIsUploadingAudio] = useState(false); // 💡 NEW: Loading state
+    const [voiceModelId, setVoiceModelId] = useState<string | null>(null); // 💡 NEW: Store voice model ID from backend
 
     // 💡 RENAMED: Use mediaUri for the file path
     const [mediaUri, setMediaUri] = useState<string | null>(null);
@@ -132,25 +140,183 @@ const HomeScreen: React.FC = () => {
         createRippleAnimation(ripple3, ripple3Opacity).start();
     }, []);
 
-    const handleAudioPick = () => {
-        // placeholder for picking audio
-        setAudio("sample_audio.mp3");
+    const handleAudioPick = async () => {
+        try {
+            // 💡 Use DocumentPicker to select audio files
+            const result = await DocumentPicker.getDocumentAsync({
+                type: 'audio/*',
+                copyToCacheDirectory: true
+            });
+
+            if (result.canceled) {
+                return;
+            }
+
+            if (result.assets && result.assets.length > 0) {
+                const file = result.assets[0];
+                
+                // Check file size (Fish.Audio recommends < 10MB)
+                const fileSizeMB = (file.size || 0) / (1024 * 1024);
+                if (fileSizeMB > 10) {
+                    Alert.alert(
+                        'File Too Large',
+                        `Audio file is ${fileSizeMB.toFixed(1)}MB. Please use a file under 10MB (10-30 seconds recommended).`,
+                        [{ text: 'OK' }]
+                    );
+                    return;
+                }
+
+                setAudio(file.name);
+                setAudioUri(file.uri);
+
+                // 💡 Upload to backend immediately
+                await uploadAudioToBackend(file);
+            }
+        } catch (error) {
+            console.error('Error picking audio:', error);
+            Alert.alert('Error', 'Failed to pick audio file');
+        }
     };
 
-    const handleSubmit = () => {
+    // 💡 NEW: Function to upload audio to backend voice API
+    const uploadAudioToBackend = async (file: { uri: string; name: string; mimeType?: string }) => {
+        setIsUploadingAudio(true);
+        
+        try {
+            // Get backend URL from environment
+            const backendUrl = process.env.EXPO_PUBLIC_BACKEND_API_URL || 'http://10.234.127.239:5000';
+            
+            // Create FormData for file upload
+            const formData = new FormData();
+            
+            // Add the audio file
+            formData.append('audio', {
+                uri: file.uri,
+                type: file.mimeType || 'audio/mpeg',
+                name: file.name,
+            } as any);
+            
+            // Add name for the voice model
+            formData.append('name', name || file.name.split('.')[0]);
+
+            console.log('📤 Uploading audio to:', `${backendUrl}/api/upload-reference`);
+
+            // Upload to backend
+            const response = await fetch(`${backendUrl}/api/upload-reference`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                setVoiceModelId(data.model_id || data.reference_id);
+                Alert.alert(
+                    '✅ Voice Model Created!',
+                    `Your voice has been uploaded successfully!\n\nModel ID: ${data.model_id}\n\nYou can now use this voice for your Echo.`,
+                    [{ text: 'OK' }]
+                );
+                console.log('✅ Voice model created:', data.model_id);
+            } else {
+                throw new Error(data.error || 'Upload failed');
+            }
+        } catch (error) {
+            console.error('❌ Upload error:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            Alert.alert(
+                'Upload Failed',
+                `Failed to upload audio to backend: ${errorMessage}\n\nThe audio file is saved locally but won't have voice cloning.`,
+                [{ text: 'OK' }]
+            );
+        } finally {
+            setIsUploadingAudio(false);
+        }
+    };
+
+    const handleSubmit = async () => {
         console.log({
             name,
             description,
             audio,
+            audioUri,
+            voiceModelId, // 💡 Include voice model ID
             mediaUri, // 💡 LOGGING NEW MEDIA STATE
             mediaType
         });
+        
+        // 💡 NEW: Generate voice sample if we have both description and voice model
+        if (description && voiceModelId) {
+            try {
+                Alert.alert(
+                    '🎤 Generating Voice Sample',
+                    'Creating audio with your voice model...',
+                    [{ text: 'OK' }]
+                );
+
+                await generateVoiceSample(description, voiceModelId);
+            } catch (error) {
+                console.error('Error generating voice:', error);
+                // Don't block Echo creation if voice generation fails
+            }
+        }
+        
+        // TODO: Send this data to your backend/database
+        // Example: await createEcho({ name, description, voiceModelId, mediaUri, mediaType });
+        
         setModalVisible(false);
         setName("");
         setDescription("");
         setAudio(null);
+        setAudioUri(null);
+        setVoiceModelId(null);
         setMediaUri(null); // 💡 CLEAR NEW MEDIA STATE
         setMediaType(null); // 💡 CLEAR NEW MEDIA TYPE STATE
+    };
+
+    // 💡 NEW: Function to generate voice sample from description
+    const generateVoiceSample = async (text: string, modelId: string) => {
+        try {
+            const backendUrl = process.env.EXPO_PUBLIC_BACKEND_API_URL || 'http://10.234.127.239:5000';
+            
+            console.log('🎤 Generating voice with text:', text.substring(0, 50) + '...');
+            console.log('🎤 Using voice model:', modelId);
+
+            const response = await fetch(`${backendUrl}/api/synthesize`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    reference_id: modelId,
+                    format: 'mp3' // Use MP3 format
+                }),
+            });
+
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                console.log('✅ Voice generated:', data.audio_path);
+                Alert.alert(
+                    '✅ Voice Generated!',
+                    `Audio file created: ${data.audio_path}\n\nYou can find it in backend/outputs/`,
+                    [{ text: 'OK' }]
+                );
+            } else {
+                throw new Error(data.error || 'Voice generation failed');
+            }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('❌ Voice generation error:', errorMessage);
+            Alert.alert(
+                'Voice Generation Failed',
+                `Could not generate audio: ${errorMessage}`,
+                [{ text: 'OK' }]
+            );
+        }
     };
 
     // 💡 HELPER COMPONENT FOR MEDIA PREVIEW
@@ -296,13 +462,35 @@ const HomeScreen: React.FC = () => {
                         {/* 💡 NEW: Media Preview */}
                         <MediaPreview />
 
-                        <TouchableOpacity style={styles.audioButton} onPress={handleAudioPick}>
-                            <Ionicons name="musical-notes" size={22} color="#FFF" />
-                            <Text style={styles.audioButtonText}>
-                                {audio ? audio : "Select audio file"}
-                            </Text>
-                            <Ionicons name="cloud-upload-outline" size={22} color="#FFF" style={styles.uploadIcon} />
+                        {/* 💡 UPDATED: Audio Button with loading state */}
+                        <TouchableOpacity 
+                            style={[styles.audioButton, isUploadingAudio && styles.audioButtonDisabled]} 
+                            onPress={handleAudioPick}
+                            disabled={isUploadingAudio}
+                        >
+                            {isUploadingAudio ? (
+                                <>
+                                    <ActivityIndicator color="#FFF" size="small" />
+                                    <Text style={styles.audioButtonText}>Uploading to backend...</Text>
+                                </>
+                            ) : (
+                                <>
+                                    <Ionicons name={voiceModelId ? "checkmark-circle" : "musical-notes"} size={22} color="#FFF" />
+                                    <Text style={styles.audioButtonText}>
+                                        {audio ? `✅ ${audio}` : "Select audio file"}
+                                    </Text>
+                                    <Ionicons name="cloud-upload-outline" size={22} color="#FFF" style={styles.uploadIcon} />
+                                </>
+                            )}
                         </TouchableOpacity>
+
+                        {/* 💡 NEW: Show voice model ID if available */}
+                        {voiceModelId && (
+                            <View style={styles.voiceModelInfo}>
+                                <Ionicons name="cloud-done-outline" size={20} color="#4CAF50" />
+                                <Text style={styles.voiceModelText}>Voice Model Ready: {voiceModelId.substring(0, 12)}...</Text>
+                            </View>
+                        )}
 
                         <View style={styles.modalActions}>
                             <TouchableOpacity
@@ -570,7 +758,28 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         flex: 1,
     },
+    audioButtonDisabled: {
+        opacity: 0.6,
+    },
     uploadIcon: {
+        marginLeft: 8,
+    },
+
+    // 💡 NEW: Voice model info styles
+    voiceModelInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#E8F5E9',
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#4CAF50',
+    },
+    voiceModelText: {
+        color: '#2E7D32',
+        fontSize: 13,
+        fontWeight: '600',
         marginLeft: 8,
     },
 

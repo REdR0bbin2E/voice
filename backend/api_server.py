@@ -99,6 +99,9 @@ def upload_reference():
     Expects multipart/form-data with:
     - audio: audio file
     - name: optional name for the reference
+    - user_id: optional user ID to link the voice model (recommended)
+    - echo_id: optional echo ID to link the voice model
+    - file_type: 'audio' or 'video' (default: 'audio')
     """
     try:
         if 'audio' not in request.files:
@@ -106,6 +109,9 @@ def upload_reference():
         
         audio_file = request.files['audio']
         name = request.form.get('name', 'Reference Audio')
+        user_id = request.form.get('user_id')  # Optional
+        echo_id = request.form.get('echo_id')  # Optional
+        file_type = request.form.get('file_type', 'audio')
         
         # Save temporarily
         temp_path = Path("temp") / audio_file.filename
@@ -115,18 +121,53 @@ def upload_reference():
         # Upload to Fish.Audio
         result = voice_service.upload_reference_audio(str(temp_path), name)
         
-        # Clean up temp file
-        temp_path.unlink()
-        
         # Extract model_id from result (voice_service returns a dict)
         model_id = result.get('model_id') or result.get('reference_id') if isinstance(result, dict) else result
         
-        return jsonify({
+        # Save to database if user_id provided and MongoDB is configured
+        db_record = None
+        if user_id and db.voice_models:
+            try:
+                from bson.objectid import ObjectId
+                user_obj_id = ObjectId(user_id)
+                echo_obj_id = ObjectId(echo_id) if echo_id else None
+                
+                db_record = db.create_voice_model(
+                    user_id=user_obj_id,
+                    model_id=model_id,
+                    name=name,
+                    audio_file_path=audio_file.filename,  # Original filename
+                    file_type=file_type,
+                    echo_id=echo_obj_id
+                )
+                
+                # Convert ObjectIds to strings for JSON response
+                if db_record:
+                    db_record['_id'] = str(db_record['_id'])
+                    db_record['user_id'] = str(db_record['user_id'])
+                    if db_record.get('echo_id'):
+                        db_record['echo_id'] = str(db_record['echo_id'])
+                    db_record['created_at'] = db_record['created_at'].isoformat()
+                    
+            except Exception as db_error:
+                print(f"Warning: Could not save to database: {db_error}")
+                # Continue anyway - Fish.Audio upload was successful
+        
+        # Clean up temp file
+        temp_path.unlink()
+        
+        response = {
             "success": True,
             "model_id": model_id,
             "reference_id": model_id,
             "message": "Reference audio uploaded successfully"
-        }), 201
+        }
+        
+        if db_record:
+            response["database_record"] = db_record
+            response["message"] += " and saved to database"
+        
+        return jsonify(response), 201
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -214,13 +255,106 @@ def manage_conversation(echo_id):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/api/voice-models', methods=['GET'])
+def get_voice_models():
+    """
+    Get all voice models for a user.
+    
+    Query parameters:
+    - user_id: User's ObjectId (required)
+    """
+    try:
+        user_id = request.args.get('user_id')
+        if not user_id:
+            return jsonify({"error": "user_id is required"}), 400
+        
+        from bson.objectid import ObjectId
+        user_obj_id = ObjectId(user_id)
+        
+        models = db.get_voice_models_for_user(user_obj_id)
+        
+        # Convert ObjectIds to strings
+        for model in models:
+            model['_id'] = str(model['_id'])
+            model['user_id'] = str(model['user_id'])
+            if model.get('echo_id'):
+                model['echo_id'] = str(model['echo_id'])
+            if model.get('created_at'):
+                model['created_at'] = model['created_at'].isoformat()
+        
+        return jsonify({"voice_models": models, "count": len(models)}), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/voice-models/<model_id>', methods=['GET', 'DELETE'])
+def manage_voice_model(model_id):
+    """
+    Get or delete a specific voice model by model_id.
+    
+    GET: Retrieve voice model details
+    DELETE: Remove voice model from database
+    """
+    try:
+        if request.method == 'DELETE':
+            success = db.delete_voice_model(model_id)
+            if success:
+                return jsonify({"success": True, "message": "Voice model deleted"}), 200
+            else:
+                return jsonify({"error": "Voice model not found or could not be deleted"}), 404
+        else:
+            # GET request
+            model = db.get_voice_model_by_id(model_id)
+            if not model:
+                return jsonify({"error": "Voice model not found"}), 404
+            
+            # Convert ObjectIds to strings
+            model['_id'] = str(model['_id'])
+            model['user_id'] = str(model['user_id'])
+            if model.get('echo_id'):
+                model['echo_id'] = str(model['echo_id'])
+            if model.get('created_at'):
+                model['created_at'] = model['created_at'].isoformat()
+            
+            return jsonify({"voice_model": model}), 200
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/echo/<echo_id>/voice-model', methods=['GET'])
+def get_echo_voice_model(echo_id):
+    """Get the voice model associated with a specific Echo."""
+    try:
+        from bson.objectid import ObjectId
+        echo_obj_id = ObjectId(echo_id)
+        
+        model = db.get_voice_model_for_echo(echo_obj_id)
+        if not model:
+            return jsonify({"error": "No voice model found for this Echo"}), 404
+        
+        # Convert ObjectIds to strings
+        model['_id'] = str(model['_id'])
+        model['user_id'] = str(model['user_id'])
+        if model.get('echo_id'):
+            model['echo_id'] = str(model['echo_id'])
+        if model.get('created_at'):
+            model['created_at'] = model['created_at'].isoformat()
+        
+        return jsonify({"voice_model": model}), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == '__main__':
     print("=" * 60)
     print("🚀 Starting Echo Backend API Server")
     print("=" * 60)
     print(f"📍 Server URL: http://{Config.API_HOST}:{Config.API_PORT}")
     print(f"🔧 Fish.Audio API: {Config.FISH_AUDIO_API_URL}")
-    print(f"✅ MongoDB: {'Connected' if Config.MONGO_URI and Config.MONGO_URI != 'your_mongodb_connection_string_here' else '⚠️  Not configured'}")
+    print(f"💾 MongoDB: ⚠️ Disabled (not needed for voice routing)")
     print("=" * 60)
     print("\n💡 Press CTRL+C to stop the server\n")
     
@@ -228,7 +362,7 @@ if __name__ == '__main__':
         app.run(
             host=Config.API_HOST,
             port=Config.API_PORT,
-            debug=False,  # DEBUG OFF - prevents crashes on Windows
+            debug=False,
             use_reloader=False,
             threaded=True
         )
