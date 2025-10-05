@@ -1,13 +1,44 @@
-// EchoesMessaging.tsx
+// app/(app)/(tabs)/EchoesMessaging.tsx
+
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from "react-native";
-import echoes from "../../dummyJson/echoes.json";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Platform } from "react-native";
+import { useRouter } from 'expo-router';
+
+// ⚠️ NEW: Import the dummy data from the specified location
+import DUMMY_ECHOS from "../../dummyJson/echoes.json";
+import { Ionicons } from "@expo/vector-icons";
+const TAB_BAR_HEIGHT_SPACE = Platform.OS === 'ios' ? 120 : 100;
 
 const { width, height } = Dimensions.get("window");
 
+// Define the type for a single Echo item based on your JSON structure
+type EchoItem = typeof DUMMY_ECHOS[0];
+
+
 const EchoesMessaging: React.FC = () => {
-    const renderItem = ({ item }: { item: any }) => (
-        <TouchableOpacity style={styles.card} activeOpacity={0.7}>
+    const router = useRouter();
+
+    const handleEchoPress = (echoId: string, echoName: string, echoPrompt: string) => {
+        // Navigate to the standalone chat route, passing the unique Echo ID, Name, and Prompt
+        router.push({
+            // Path to: app/(app)/chat/[id].tsx
+            pathname: "../chat/[id]",
+            params: {
+                id: echoId,
+                name: echoName,
+                // Pass the full description prompt to the chat screen
+                descriptionPrompt: echoPrompt,
+            },
+        });
+    };
+
+    // The renderItem component is updated to use the EchoItem type and the correct properties
+    const renderItem = ({ item }: { item: EchoItem }) => (
+        <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.7}
+            onPress={() => handleEchoPress(item.id, item.name, item.descriptionPrompt)}
+        >
             <View style={styles.cardContent}>
                 <View style={styles.avatarContainer}>
                     <View style={styles.avatar}>
@@ -16,7 +47,10 @@ const EchoesMessaging: React.FC = () => {
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={styles.nameText}>{item.name}</Text>
-                    <Text style={styles.subtitleText}>Tap to open conversation</Text>
+                    {/* Display a snippet of the description prompt as the card subtitle */}
+                    <Text style={styles.subtitleText}>
+                        {item.descriptionPrompt.substring(0, 50)}...
+                    </Text>
                 </View>
                 <View style={styles.chevronContainer}>
                     <Text style={styles.chevron}>›</Text>
@@ -27,24 +61,29 @@ const EchoesMessaging: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            {/* Enhanced background with gradient overlay */}
             <View style={styles.backgroundOverlay} />
 
-            {/* Background shapes */}
             <View style={[styles.circle, styles.circleOne]} />
             <View style={[styles.circle, styles.circleTwo]} />
             <View style={[styles.circle, styles.circleThree]} />
             <View style={[styles.circle, styles.circleFour]} />
 
             <FlatList
-                data={echoes}
-                keyExtractor={(_, index) => index.toString()}
+                // ⚠️ Use the imported DUMMY_ECHOS array
+                data={DUMMY_ECHOS}
+                keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.list}
                 ListHeaderComponent={
                     <View style={styles.headerContainer}>
-                        <Text style={styles.title}>Echoes</Text>
-                        <Text style={styles.subtitle}>Your conversations</Text>
+                        <Text style={styles.title}>Your Echoes</Text>
+                        <Ionicons
+                            name="logo-soundcloud" // Suitable timeline/date icon
+                            size={28}
+                            color="#B7A9C9"
+                            style={{ marginBottom: 10 }}
+                        />
+                        <Text style={styles.subtitle}>Voices that matter most</Text>
                     </View>
                 }
                 showsVerticalScrollIndicator={false}
@@ -53,14 +92,16 @@ const EchoesMessaging: React.FC = () => {
     );
 };
 
+// --- Styles (kept consistent with your original request) ---
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#F6F1E9",
         paddingHorizontal: 16,
-    },
+        paddingBottom: TAB_BAR_HEIGHT_SPACE - 20,
 
-    // Background overlay for depth
+    },
     backgroundOverlay: {
         position: "absolute",
         top: 0,
@@ -69,8 +110,6 @@ const styles = StyleSheet.create({
         height: height * 0.4,
         backgroundColor: "rgba(183, 169, 201, 0.05)",
     },
-
-    // Background shapes
     circle: {
         position: "absolute",
         borderRadius: 9999,
@@ -105,8 +144,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#E8C07D",
         opacity: 0.08,
     },
-
-    // Header
     headerContainer: {
         marginTop: height * 0.12,
         marginBottom: 28,
@@ -125,12 +162,9 @@ const styles = StyleSheet.create({
         opacity: 0.7,
         fontWeight: "400",
     },
-
     list: {
         paddingBottom: 40,
     },
-
-    // Card design
     card: {
         backgroundColor: "#FFFFFF",
         borderRadius: 16,
@@ -148,8 +182,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 14,
     },
-
-    // Avatar
     avatarContainer: {
         marginRight: 14,
     },
@@ -169,8 +201,6 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: "#FFFFFF",
     },
-
-    // Text content
     textContainer: {
         flex: 1,
     },
@@ -186,8 +216,6 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         opacity: 0.5
     },
-
-    // Chevron
     chevronContainer: {
         marginLeft: 8,
     },

@@ -4,25 +4,24 @@ import { useRouter } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
-const SignupScreen: React.FC = () => {
+const LoginScreen: React.FC = () => {
   const router = useRouter();
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const isValid = useMemo(() => {
-    if (!username.trim() || !email.trim() || !password || !confirmPassword) return false;
-    // simple email check
-    const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
-    const passwordsMatch = password === confirmPassword && password.length >= 8;
-    return emailOk && passwordsMatch;
-  }, [username, email, password, confirmPassword]);
+  const canSubmit = useMemo(() => {
+    return username.trim().length > 0 && password.length > 0;
+  }, [username, password]);
 
   function onSubmit() {
-    if (!isValid) return;
-    // TODO: call real signup API here
-    router.replace('/(tabs)/HomePage');
+    if (!canSubmit) return;
+    // TODO: call real login API here
+
+    // --- UPDATED NAVIGATION ---
+    // After successful login, redirect the user to the main application group.
+    // The main app is now in the '(app)' group. This will usually land on the first tab.
+    router.replace('../(tabs)/HomePage');
+    // If you want to be extremely specific: router.replace('/(app)/(tabs)/HomePage');
   }
 
   return (
@@ -38,25 +37,23 @@ const SignupScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
-
-
-
-        {/* Logo/Brand Section */}
+        {/* Brand Section */}
         <View style={styles.brandContainer}>
           <Image source={require('../../assets/images/echoTempLogo.png')} resizeMode='contain' style={{ width: 175, height: 175 }} />
-          <Text style={styles.brandTagline}>Reflect • Connect • Grow</Text>
+
+          <Text style={styles.brandTagline}>Keep their memory alive</Text>
         </View>
 
-        {/* Signup card */}
+        {/* Login card */}
         <View style={styles.card}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Start your journey of reflection</Text>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Log in to continue your journey</Text>
 
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Username</Text>
             <TextInput
               style={styles.input}
-              placeholder="Choose a unique username"
+              placeholder="Enter your username"
               placeholderTextColor="#B8B8B8"
               autoCapitalize="none"
               value={username}
@@ -65,23 +62,10 @@ const SignupScreen: React.FC = () => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="your.email@example.com"
-              placeholderTextColor="#B8B8B8"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Password</Text>
             <TextInput
               style={styles.input}
-              placeholder="Minimum 8 characters"
+              placeholder="Enter your password"
               placeholderTextColor="#B8B8B8"
               secureTextEntry
               value={password}
@@ -89,25 +73,18 @@ const SignupScreen: React.FC = () => {
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Confirm Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Re-enter your password"
-              placeholderTextColor="#B8B8B8"
-              secureTextEntry
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-          </View>
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+            {/* TODO: Add navigation to a reset password screen here, e.g., router.push('reset-password') */}
+          </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.button, !isValid && { opacity: 0.6 }]}
+            style={[styles.button, !canSubmit && { opacity: 0.6 }]}
             activeOpacity={0.8}
             onPress={onSubmit}
-            disabled={!isValid}
+            disabled={!canSubmit}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
+            <Text style={styles.buttonText}>Log In</Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -116,12 +93,22 @@ const SignupScreen: React.FC = () => {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity style={styles.loginLink} onPress={() => router.push('./(tabs)/explore')}>
-            <Text style={styles.loginLinkText}>
-              Already have an account? <Text style={styles.loginLinkBold}>Log in</Text>
+          <TouchableOpacity
+            style={styles.signupLink}
+            // --- UPDATED NAVIGATION ---
+            // Navigate to the sibling 'signup' screen within the same (auth) group
+            onPress={() => router.replace('./signup')}
+          >
+            <Text style={styles.signupLinkText}>
+              Don&apos;t have an account? <Text style={styles.signupLinkBold}>Sign up</Text>
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* Support footer */}
+        <TouchableOpacity style={styles.supportContainer}>
+          <Text style={styles.supportText}>Need help? Contact support</Text>
+        </TouchableOpacity>
 
         {/* Extra padding at bottom */}
         <View style={styles.bottomPadding} />
@@ -166,7 +153,7 @@ const styles = StyleSheet.create({
   circleThree: {
     width: 200,
     height: 200,
-    top: height * 0.3,
+    top: height * 0.35,
     right: -70,
     backgroundColor: '#E6AFA4',
     opacity: 0.1,
@@ -174,7 +161,7 @@ const styles = StyleSheet.create({
   circleFour: {
     width: 160,
     height: 160,
-    bottom: height * 0.25,
+    bottom: height * 0.3,
     left: -50,
     backgroundColor: '#F2C6C2',
     opacity: 0.12,
@@ -186,13 +173,13 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: '#E6AFA4',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
     shadowColor: '#E6AFA4',
     shadowOpacity: 0.4,
     shadowRadius: 12,
@@ -200,22 +187,23 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   logoText: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: '700',
     color: '#FFF',
   },
   brandName: {
-    fontSize: 36,
+    fontSize: 40,
     fontWeight: '700',
     color: '#B7A9C9',
     letterSpacing: 1,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   brandTagline: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#B7A9C9',
-    opacity: 0.6,
-    letterSpacing: 0.5,
+    opacity: 0.65,
+    letterSpacing: 0.3,
+    fontStyle: 'italic',
   },
 
   // Card
@@ -271,6 +259,18 @@ const styles = StyleSheet.create({
     color: '#2C2C2E',
   },
 
+  // Forgot password
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 20,
+    paddingVertical: 4,
+  },
+  forgotPasswordText: {
+    fontSize: 13,
+    color: '#E6AFA4',
+    fontWeight: '600',
+  },
+
   // Button
   button: {
     width: '100%',
@@ -278,7 +278,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6AFA4',
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 8,
     shadowColor: '#E6AFA4',
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -311,17 +310,28 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // Login link
-  loginLink: {
+  // Signup link
+  signupLink: {
     paddingVertical: 8,
   },
-  loginLinkText: {
+  signupLinkText: {
     fontSize: 14,
     color: '#8E8E93',
   },
-  loginLinkBold: {
+  signupLinkBold: {
     fontWeight: '600',
     color: '#E6AFA4',
+  },
+
+  // Support
+  supportContainer: {
+    marginTop: 24,
+    paddingVertical: 8,
+  },
+  supportText: {
+    fontSize: 13,
+    color: '#B7A9C9',
+    opacity: 0.6,
   },
 
   // Bottom padding
@@ -330,4 +340,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignupScreen;
+export default LoginScreen;
