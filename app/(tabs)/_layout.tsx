@@ -61,25 +61,6 @@ export default function TabLayout() {
         }
       }}>
 
-      {/* --- AUTH/REDIRECTION SCREENS (Hidden Tab Bar) --- */}
-      {/* These screens should hide the tab bar completely */}
-      <Tabs.Screen
-        name="index" // Assuming this is your main redirect or Signup screen
-        options={{
-          title: 'Sign Up',
-          tabBarStyle: { display: 'none' }, // HIDES THE TAB BAR
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="person.badge.key" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore" // Assuming this is your Login screen
-        options={{
-          title: 'Login',
-          tabBarStyle: { display: 'none' }, // HIDES THE TAB BAR
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="lock.fill" color={color} />,
-        }}
-      />
-
       {/* --- MAIN APPLICATION TABS --- */}
 
       <Tabs.Screen

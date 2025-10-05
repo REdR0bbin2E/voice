@@ -34,48 +34,26 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        {/* 1. Conditionally render (app) or (auth) */}
-        {user ? (
-          // If the user IS logged in, show the main app group
-          <Stack.Screen name="(app)" options={{ headerShown: false }} />
-        ) : (
-          // If the user is NOT logged in, show the authentication group
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        )}
-
-        {/* 2. Keep the modal as a shared screen outside the main groups */}
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-
-        {/* 3. Catch-all for 404/Unknown routes */}
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Main tab navigation (accessible when logged in) */}
+        <Stack.Screen name="(tabs)" />
+        
+        {/* Auth screens (login/signup) */}
+        <Stack.Screen name="(auth)" />
+        
+        {/* Chat screen */}
+        <Stack.Screen name="chat/[id]" options={{ presentation: 'card' }} />
+        
+        {/* Modal screen */}
+        <Stack.Screen name="modal" options={{ presentation: 'modal', headerShown: true }} />
+        
+        {/* Root index (redirect screen) */}
+        <Stack.Screen name="index" />
+        
+        {/* 404 screen */}
         <Stack.Screen name="+not-found" />
-
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
-
-// ⚠️ You'll also need a separate layout for the (app) group
-// to redirect unauthenticated access, though the above logic handles it.
-// e.g., app/(app)/_layout.tsx:
-/*
-import { Redirect, Stack } from 'expo-router';
-import { useAuth } from '@/hooks/use-auth';
-
-export default function AppLayout() {
-  const { user } = useAuth();
-
-  // If the user is not logged in, redirect them to the login screen
-  if (!user) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
-  // Render the inner app stack (where the tabs are defined)
-  return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
-  );
-}
-*/
