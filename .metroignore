@@ -1,0 +1,7 @@
+# Metro bundler ignore patterns
+fish/
+backend/
+*.py
+*.pyc
+__pycache__/
+.env

@@ -3,6 +3,7 @@ import datetime
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
+from .config import Config
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,12 +13,42 @@ class DatabaseManager:
         """
         Initializes the database connection.
         """
-        mongo_uri = os.getenv("MONGO_URI")
-        if not mongo_uri:
-            raise Exception("MONGO_URI not found in environment variables!")
+        mongo_uri = Config.MONGO_URI
         
-        # Establish the connection
-        self.client = MongoClient(mongo_uri)
+        # Skip MongoDB initialization if not configured
+        if not mongo_uri or mongo_uri == "your_mongodb_connection_string_here":
+            print("⚠️  MongoDB not configured - database features disabled")
+            self.client = None
+            self.db = None
+            self.users = None
+            self.echos = None
+            self.messages = None
+            return
+        
+        try:
+            # Establish the connection
+            self.client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+            
+            # Test the connection
+            self.client.admin.command('ping')
+            
+            # Select the database
+            self.db = self.client['echo_db']
+            
+            # Get references to the collections we will use
+            self.users = self.db.users
+            self.echos = self.db.echos
+            self.messages = self.db.messages
+            
+            print("✅ DatabaseManager initialized. MongoDB connection successful.")
+        except Exception as e:
+            print(f"❌ MongoDB connection failed: {e}")
+            print("⚠️  Database features will be disabled")
+            self.client = None
+            self.db = None
+            self.users = None
+            self.echos = None
+            self.messages = None
         
         # Select the database
         self.db = self.client['echo_db']

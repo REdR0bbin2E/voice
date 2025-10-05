@@ -1,0 +1,14 @@
+{
+  "ignore_dirs": [
+    "fish",
+    "fish/fish-speech",
+    "fish/fish-speech/.venv",
+    "backend",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    ".git",
+    "node_modules"
+  ]
+}

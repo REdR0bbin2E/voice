@@ -1,0 +1,9 @@
+# Ignore fish folder (using Fish.Audio API instead)
+fish/
+
+# Ignore backend folder
+backend/
+
+# Standard ignores
+node_modules/
+.expo/
