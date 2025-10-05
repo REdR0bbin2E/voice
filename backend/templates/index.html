@@ -218,7 +218,10 @@
                 <div class="input-group">
                     <label for="audioFile">Upload Reference Audio (.wav, .mp3):</label>
                     <input type="file" id="audioFile" accept="audio/*" />
-                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">Upload 10-30 seconds of clear audio. This will create a voice model on Fish.Audio.</small>
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        ⚠️ <strong>IMPORTANT:</strong> Audio must be <strong>10-30 seconds long</strong> (Fish.Audio limit: under 270 seconds).
+                        <br>File should be under 1-2 MB for best results. Longer files will be rejected!
+                    </small>
                 </div>
                 
                 <button class="test-button" onclick="uploadAndSetVoice()">Upload & Create Voice Model</button>
@@ -297,7 +300,24 @@
             }
             
             const file = fileInput.files[0];
-            console.log('📁 Selected file:', file.name, '- Size:', file.size, 'bytes');
+            const fileSizeMB = file.size / (1024 * 1024);
+            console.log('📁 Selected file:', file.name, '- Size:', fileSizeMB.toFixed(2), 'MB');
+            
+            // Warn if file is too large (Fish.Audio limit: <270 seconds, roughly <10MB)
+            if (fileSizeMB > 10) {
+                const confirmUpload = confirm(
+                    `⚠️ WARNING: File is ${fileSizeMB.toFixed(1)}MB!\n\n` +
+                    `Fish.Audio requires audio UNDER 270 seconds (4.5 minutes).\n` +
+                    `Large files will likely be rejected.\n\n` +
+                    `Recommended: 10-30 seconds (under 1-2 MB)\n\n` +
+                    `Do you want to try uploading anyway?`
+                );
+                if (!confirmUpload) {
+                    showUploadResult('❌ Upload cancelled. Please prepare a shorter audio file (10-30 seconds recommended).', false);
+                    return;
+                }
+            }
+            
             const formData = new FormData();
             formData.append('audio', file);
             formData.append('name', file.name.split('.')[0]); // Use filename as voice name

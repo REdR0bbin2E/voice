@@ -15,7 +15,7 @@ def test_upload_and_clone():
     
     # Step 1: Upload reference audio
     print("\n📤 Step 1: Uploading reference audio...")
-    audio_file_path = "C:\\Users\\xxsoi\\Desktop\\Coding\\voice\\speech\\input.mp3"
+    audio_file_path = "C:\\Users\\xxsoi\\Desktop\\Coding\\voice\\backend\\inputs\\Countdown & Encouragement 18.mp3"
     
     with open(audio_file_path, 'rb') as f:
         files = {'audio': (audio_file_path.split('\\')[-1], f, 'audio/mpeg')}
@@ -67,8 +67,8 @@ if __name__ == "__main__":
     try:
         test_upload_and_clone()
     except FileNotFoundError:
-        print("❌ Error: input.mp3 not found!")
+        print("❌ Error: Audio file not found!")
         print("   Please make sure you have an audio file at:")
-        print("   C:\\Users\\xxsoi\\Desktop\\Coding\\voice\\speech\\input.mp3")
+        print("   C:\\Users\\xxsoi\\Desktop\\Coding\\voice\\backend\\inputs\\Countdown & Encouragement 18.mp3")
     except Exception as e:
         print(f"❌ Error: {e}")

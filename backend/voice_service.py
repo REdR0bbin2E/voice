@@ -157,6 +157,9 @@ class VoiceServiceWrapper:
             
         Returns:
             Dict with model_id (reference_id)
+            
+        Note:
+            Fish.Audio requires audio to be LESS THAN 270 seconds (4.5 minutes)
         """
         # Handle file path or bytes
         if isinstance(audio_file_path, (str, Path)):
@@ -164,6 +167,11 @@ class VoiceServiceWrapper:
             if not audio_path.exists():
                 raise FileNotFoundError(f"Audio file not found: {audio_file_path}")
             file_to_upload = audio_path
+            
+            # Check file size (rough estimate: 1MB ≈ 60 seconds for MP3)
+            file_size_mb = audio_path.stat().st_size / (1024 * 1024)
+            if file_size_mb > 10:  # Rough check - 10MB is likely > 270 seconds
+                raise ValueError(f"Audio file is too large ({file_size_mb:.1f}MB). Fish.Audio requires audio under 270 seconds (4.5 minutes). Please upload a shorter clip (10-30 seconds recommended).")
         else:
             # Save bytes to temp file
             import uuid
@@ -182,7 +190,8 @@ class VoiceServiceWrapper:
                     'type': 'tts',
                     'train_mode': 'fast',
                     'title': name or f'Voice Model {datetime.now().strftime("%Y%m%d_%H%M%S")}',
-                    'texts': 'Reference audio for voice cloning'
+                    'texts': 'Reference audio for voice cloning',
+                    'visibility': 'private'  # Make models private (no cover image required)
                 }
                 
                 response = requests.post(
@@ -192,6 +201,17 @@ class VoiceServiceWrapper:
                     data=data,
                     timeout=60
                 )
+                
+                # Better error handling for Fish.Audio errors
+                if response.status_code == 400:
+                    error_msg = response.text
+                    if "too long" in error_msg.lower() or "270" in error_msg:
+                        raise ValueError("Audio file is too long! Fish.Audio requires audio under 270 seconds (4.5 minutes). Please upload a 10-30 second clip instead.")
+                    elif "cover image" in error_msg.lower():
+                        raise ValueError("Fish.Audio requires a cover image for public models. The model visibility has been set to private to avoid this issue. Please try again.")
+                    else:
+                        raise ValueError(f"Fish.Audio rejected the audio: {error_msg}")
+                
                 response.raise_for_status()
                 
                 result = response.json()
