@@ -95,6 +95,7 @@ export default function TabLayout() {
         }}
       />
 
+<<<<<<< HEAD
       <Tabs.Screen
         name="timeline" // Assuming you have a timeline.tsx file
         options={{
@@ -111,6 +112,8 @@ export default function TabLayout() {
         }}
       />
 
+=======
+>>>>>>> b0e1174461ecb9a0b796c7f5334704494a9e0d12
     </Tabs>
   );
 }
