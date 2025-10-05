@@ -1,0 +1,222 @@
+[
+    {
+        "id": "p1",
+        "name": "Mom",
+        "descriptionPrompt": "Describe a warm, patient woman in her late 50s who always kept the kitchen smelling of cinnamon and coffee. She wore soft cardigans, hummed lullabies while making breakfast, and had a gentle laugh that put children at ease. Include sensory details (touch of her hand, the creak of her favorite chair), a memorable habit (writing sticky notes), and one short anecdote that captures her generosity.",
+        "audioSamples": [
+            {
+                "filename": "mom_laugh.mp3",
+                "url": "https://example.com/audio/mom_laugh.mp3",
+                "duration_s": 6
+            },
+            {
+                "filename": "mom_reading_voice.mp3",
+                "url": "https://example.com/audio/mom_reading_voice.mp3",
+                "duration_s": 22
+            },
+            {
+                "filename": "kitchen_ambient.mp3",
+                "url": "https://example.com/audio/kitchen_ambient.mp3",
+                "duration_s": 45
+            }
+        ]
+    },
+    {
+        "id": "p2",
+        "name": "Grandpa Joe",
+        "descriptionPrompt": "Describe an elderly man with a weathered smile who loved telling tall fishing stories. He smelled faintly of tobacco and motor oil, kept a cedar chest full of letters, and tapped his pipe when thinking. Include a small scene of him fixing a toy train and a line about his pride in family recipes.",
+        "audioSamples": [
+            {
+                "filename": "grandpa_story.mp3",
+                "url": "https://example.com/audio/grandpa_story.mp3",
+                "duration_s": 30
+            },
+            {
+                "filename": "porch_ambience.mp3",
+                "url": "https://example.com/audio/porch_ambience.mp3",
+                "duration_s": 60
+            },
+            {
+                "filename": "humming_tune.mp3",
+                "url": "https://example.com/audio/humming_tune.mp3",
+                "duration_s": 12
+            }
+        ]
+    },
+    {
+        "id": "p3",
+        "name": "Aunt Lena",
+        "descriptionPrompt": "Describe a lively aunt in her 40s known for bright scarves and the ability to find beauty in small things. She ran a flower stand, always offered tea and advice, and kept postcards from trips pinned to a corkboard. Include colors, favorite phrases she said, and a tender moment where she comforts a friend.",
+        "audioSamples": [
+            {
+                "filename": "aunt_lena_laugh.mp3",
+                "url": "https://example.com/audio/aunt_lena_laugh.mp3",
+                "duration_s": 7
+            },
+            {
+                "filename": "market_sounds.mp3",
+                "url": "https://example.com/audio/market_sounds.mp3",
+                "duration_s": 40
+            },
+            {
+                "filename": "soft_advice.mp3",
+                "url": "https://example.com/audio/soft_advice.mp3",
+                "duration_s": 18
+            }
+        ]
+    },
+    {
+        "id": "p4",
+        "name": "Big Brother",
+        "descriptionPrompt": "Describe a protective older brother in his early 30s who loved tinkering with bicycles. He had quick hands, a mischievous grin, and a scar on his knuckle from teaching the narrator to ride. Include the sound of tools, his favorite joke, and a memory of him staying up late to help with homework.",
+        "audioSamples": [
+            {
+                "filename": "bicycle_tools.mp3",
+                "url": "https://example.com/audio/bicycle_tools.mp3",
+                "duration_s": 25
+            },
+            {
+                "filename": "brother_chuckle.mp3",
+                "url": "https://example.com/audio/brother_chuckle.mp3",
+                "duration_s": 5
+            },
+            {
+                "filename": "late_night_talk.mp3",
+                "url": "https://example.com/audio/late_night_talk.mp3",
+                "duration_s": 35
+            }
+        ]
+    },
+    {
+        "id": "p5",
+        "name": "Teacher Ms. Alvarez",
+        "descriptionPrompt": "Describe a compassionate middle-school teacher who wore bright scarves and always had a stack of graded papers with little encouraging notes. She smelled faintly of chalk, used creative metaphors to explain hard topics, and kept a class pet hamster. Include a memory of her staying after class to help a struggling student and the gentle way she corrected mistakes.",
+        "audioSamples": [
+            {
+                "filename": "classroom_bell.mp3",
+                "url": "https://example.com/audio/classroom_bell.mp3",
+                "duration_s": 4
+            },
+            {
+                "filename": "ms_alvarez_voice.mp3",
+                "url": "https://example.com/audio/ms_alvarez_voice.mp3",
+                "duration_s": 20
+            },
+            {
+                "filename": "pen_on_paper.mp3",
+                "url": "https://example.com/audio/pen_on_paper.mp3",
+                "duration_s": 15
+            }
+        ]
+    },
+    {
+        "id": "p6",
+        "name": "Best Friend Sam",
+        "descriptionPrompt": "Describe a loyal and adventurous best friend in their late 20s who loved spontaneous road trips, awful puns, and shared playlists. Mention their laugh, the color of their old jacket, a specific road-trip snack, and a memory of a late-night conversation under city lights.",
+        "audioSamples": [
+            {
+                "filename": "car_radio_snippet.mp3",
+                "url": "https://example.com/audio/car_radio_snippet.mp3",
+                "duration_s": 28
+            },
+            {
+                "filename": "sam_laugh.mp3",
+                "url": "https://example.com/audio/sam_laugh.mp3",
+                "duration_s": 6
+            },
+            {
+                "filename": "city_night.mp3",
+                "url": "https://example.com/audio/city_night.mp3",
+                "duration_s": 55
+            }
+        ]
+    },
+    {
+        "id": "p7",
+        "name": "Baby Lily",
+        "descriptionPrompt": "Describe a tiny, adored infant whose presence filled a room with quiet joy. Use soft sensory details: the scent of lavender baby lotion, a tiny blanket with a star pattern, the cadence of small coos, and a single treasured memory (first giggle). Keep the tone gentle and comforting.",
+        "audioSamples": [
+            {
+                "filename": "baby_coo.mp3",
+                "url": "https://example.com/audio/baby_coo.mp3",
+                "duration_s": 8
+            },
+            {
+                "filename": "lullaby_fragment.mp3",
+                "url": "https://example.com/audio/lullaby_fragment.mp3",
+                "duration_s": 45
+            },
+            {
+                "filename": "soft_breathing.mp3",
+                "url": "https://example.com/audio/soft_breathing.mp3",
+                "duration_s": 30
+            }
+        ]
+    },
+    {
+        "id": "p8",
+        "name": "Uncle Marcus",
+        "descriptionPrompt": "Describe a creative uncle who played the piano and collected vinyl records. He wore rimmed glasses, told colorful family histories, and always had a small snack in his pocket. Include the sound of piano keys, his favorite record album title (fictional), and a scene of him teaching a child a simple melody.",
+        "audioSamples": [
+            {
+                "filename": "piano_keys.mp3",
+                "url": "https://example.com/audio/piano_keys.mp3",
+                "duration_s": 40
+            },
+            {
+                "filename": "vinyl_pop.mp3",
+                "url": "https://example.com/audio/vinyl_pop.mp3",
+                "duration_s": 3
+            },
+            {
+                "filename": "uncle_story.mp3",
+                "url": "https://example.com/audio/uncle_story.mp3",
+                "duration_s": 26
+            }
+        ]
+    },
+    {
+        "id": "p9",
+        "name": "Neighbor Mrs. Chen",
+        "descriptionPrompt": "Describe a kind neighbor who tended a small rooftop garden and always shared dumplings on holidays. She spoke softly, had weathered hands from tending plants, and kept tiny jars of spices labeled in neat handwriting. Include a sensory moment (steam from dumplings, dirt-smudged fingernails) and a small gesture that shows her kindness.",
+        "audioSamples": [
+            {
+                "filename": "kitchen_steam.mp3",
+                "url": "https://example.com/audio/kitchen_steam.mp3",
+                "duration_s": 20
+            },
+            {
+                "filename": "garden_wind.mp3",
+                "url": "https://example.com/audio/garden_wind.mp3",
+                "duration_s": 35
+            },
+            {
+                "filename": "mrs_chen_voice.mp3",
+                "url": "https://example.com/audio/mrs_chen_voice.mp3",
+                "duration_s": 18
+            }
+        ]
+    },
+    {
+        "id": "p10",
+        "name": "Partner Alex",
+        "descriptionPrompt": "Describe a gentle partner in their 30s who loved weekend breakfasts and early morning walks. Include details: the sound of their shoes on gravel, a favorite scarf, a private joke they shared with the narrator, and one quiet moment of comfort they offered during a hard time.",
+        "audioSamples": [
+            {
+                "filename": "morning_steps.mp3",
+                "url": "https://example.com/audio/morning_steps.mp3",
+                "duration_s": 22
+            },
+            {
+                "filename": "cafe_order.mp3",
+                "url": "https://example.com/audio/cafe_order.mp3",
+                "duration_s": 10
+            },
+            {
+                "filename": "alex_whisper.mp3",
+                "url": "https://example.com/audio/alex_whisper.mp3",
+                "duration_s": 14
+            }
+        ]
+    }
+]
