@@ -2,7 +2,7 @@
     {
         "id": "p1",
         "name": "Mom",
-        "descriptionPrompt": "Describe a warm, patient woman in her late 50s who always kept the kitchen smelling of cinnamon and coffee. She wore soft cardigans, hummed lullabies while making breakfast, and had a gentle laugh that put children at ease. Include sensory details (touch of her hand, the creak of her favorite chair), a memorable habit (writing sticky notes), and one short anecdote that captures her generosity.",
+        "descriptionPrompt": "My mom was a warm, patient woman in her late 50s who always kept the kitchen smelling of cinnamon and coffee. She wore soft cardigans, hummed lullabies while making breakfast, and had a gentle laugh that put children at ease. The touch of her hand, the creak of her favorite chair, and her habit of writing sticky notes are what I remember most. Once, she gave away an entire pie to a neighbor who had a hard day, showing her generosity.",
         "audioSamples": [
             {
                 "filename": "mom_laugh.mp3",
@@ -24,7 +24,7 @@
     {
         "id": "p2",
         "name": "Grandpa Joe",
-        "descriptionPrompt": "Describe an elderly man with a weathered smile who loved telling tall fishing stories. He smelled faintly of tobacco and motor oil, kept a cedar chest full of letters, and tapped his pipe when thinking. Include a small scene of him fixing a toy train and a line about his pride in family recipes.",
+        "descriptionPrompt": "Grandpa Joe was an elderly man with a weathered smile who loved telling tall fishing stories. He smelled faintly of tobacco and motor oil, kept a cedar chest full of letters, and tapped his pipe when he was thinking. I remember him fixing a toy train on the porch, and how proud he was of the family recipes he passed down.",
         "audioSamples": [
             {
                 "filename": "grandpa_story.mp3",
@@ -46,7 +46,7 @@
     {
         "id": "p3",
         "name": "Aunt Lena",
-        "descriptionPrompt": "Describe a lively aunt in her 40s known for bright scarves and the ability to find beauty in small things. She ran a flower stand, always offered tea and advice, and kept postcards from trips pinned to a corkboard. Include colors, favorite phrases she said, and a tender moment where she comforts a friend.",
+        "descriptionPrompt": "Aunt Lena was a lively woman in her 40s known for bright scarves and her ability to find beauty in small things. She ran a flower stand, always offered tea and advice, and kept postcards from her trips pinned to a corkboard. She often said, 'Isn't that something?' and once comforted a friend by holding her hand at the market, showing her tender heart.",
         "audioSamples": [
             {
                 "filename": "aunt_lena_laugh.mp3",
@@ -68,7 +68,7 @@
     {
         "id": "p4",
         "name": "Big Brother",
-        "descriptionPrompt": "Describe a protective older brother in his early 30s who loved tinkering with bicycles. He had quick hands, a mischievous grin, and a scar on his knuckle from teaching the narrator to ride. Include the sound of tools, his favorite joke, and a memory of him staying up late to help with homework.",
+        "descriptionPrompt": "My big brother was protective and loved tinkering with bicycles. He had quick hands, a mischievous grin, and a scar on his knuckle from teaching me to ride. I remember the sound of his tools clinking, the silly joke he always told, and the night he stayed up late to help me finish my homework.",
         "audioSamples": [
             {
                 "filename": "bicycle_tools.mp3",
@@ -90,7 +90,7 @@
     {
         "id": "p5",
         "name": "Teacher Ms. Alvarez",
-        "descriptionPrompt": "Describe a compassionate middle-school teacher who wore bright scarves and always had a stack of graded papers with little encouraging notes. She smelled faintly of chalk, used creative metaphors to explain hard topics, and kept a class pet hamster. Include a memory of her staying after class to help a struggling student and the gentle way she corrected mistakes.",
+        "descriptionPrompt": "Ms. Alvarez was a compassionate middle-school teacher who wore bright scarves and always carried a stack of graded papers with little encouraging notes. She smelled faintly of chalk, used creative metaphors to explain hard topics, and kept a class pet hamster. I remember her staying after class to help a struggling student, and the gentle way she corrected mistakes.",
         "audioSamples": [
             {
                 "filename": "classroom_bell.mp3",
@@ -112,7 +112,7 @@
     {
         "id": "p6",
         "name": "Best Friend Sam",
-        "descriptionPrompt": "Describe a loyal and adventurous best friend in their late 20s who loved spontaneous road trips, awful puns, and shared playlists. Mention their laugh, the color of their old jacket, a specific road-trip snack, and a memory of a late-night conversation under city lights.",
+        "descriptionPrompt": "Sam was a loyal and adventurous best friend in their late 20s who loved spontaneous road trips, awful puns, and shared playlists. I remember their laugh, their old jacket, the bag of sunflower seeds they always carried, and a late-night conversation we had under city lights that I’ll never forget.",
         "audioSamples": [
             {
                 "filename": "car_radio_snippet.mp3",
@@ -134,7 +134,7 @@
     {
         "id": "p7",
         "name": "Baby Lily",
-        "descriptionPrompt": "Describe a tiny, adored infant whose presence filled a room with quiet joy. Use soft sensory details: the scent of lavender baby lotion, a tiny blanket with a star pattern, the cadence of small coos, and a single treasured memory (first giggle). Keep the tone gentle and comforting.",
+        "descriptionPrompt": "Baby Lily was a tiny, adored infant whose presence filled the room with quiet joy. She smelled of lavender baby lotion, always clutched her little star-patterned blanket, and made soft coos that melted our hearts. Her first giggle was one of the most treasured memories we had.",
         "audioSamples": [
             {
                 "filename": "baby_coo.mp3",
@@ -156,7 +156,7 @@
     {
         "id": "p8",
         "name": "Uncle Marcus",
-        "descriptionPrompt": "Describe a creative uncle who played the piano and collected vinyl records. He wore rimmed glasses, told colorful family histories, and always had a small snack in his pocket. Include the sound of piano keys, his favorite record album title (fictional), and a scene of him teaching a child a simple melody.",
+        "descriptionPrompt": "Uncle Marcus was a creative man who played the piano and collected vinyl records. He wore rimmed glasses, told colorful family histories, and always had a snack tucked in his pocket. I remember the sound of his piano keys, the fictional album he loved called 'Midnight Echoes,' and how he once taught me a simple melody at the piano bench.",
         "audioSamples": [
             {
                 "filename": "piano_keys.mp3",
@@ -178,7 +178,7 @@
     {
         "id": "p9",
         "name": "Neighbor Mrs. Chen",
-        "descriptionPrompt": "Describe a kind neighbor who tended a small rooftop garden and always shared dumplings on holidays. She spoke softly, had weathered hands from tending plants, and kept tiny jars of spices labeled in neat handwriting. Include a sensory moment (steam from dumplings, dirt-smudged fingernails) and a small gesture that shows her kindness.",
+        "descriptionPrompt": "Mrs. Chen was a kind neighbor who tended a small rooftop garden and always shared dumplings on holidays. She spoke softly, had weathered hands from gardening, and kept tiny jars of spices labeled in neat handwriting. I remember the steam rising from her dumplings, her dirt-smudged fingernails, and the way she once left a small bowl of soup at my door when I was sick.",
         "audioSamples": [
             {
                 "filename": "kitchen_steam.mp3",
@@ -200,7 +200,7 @@
     {
         "id": "p10",
         "name": "Partner Alex",
-        "descriptionPrompt": "Describe a gentle partner in their 30s who loved weekend breakfasts and early morning walks. Include details: the sound of their shoes on gravel, a favorite scarf, a private joke they shared with the narrator, and one quiet moment of comfort they offered during a hard time.",
+        "descriptionPrompt": "Alex was a gentle partner in their 30s who loved weekend breakfasts and early morning walks. I remember the sound of their shoes on gravel, their favorite scarf, and a private joke we shared. During a hard time, Alex comforted me with quiet patience that I will always cherish.",
         "audioSamples": [
             {
                 "filename": "morning_steps.mp3",
